@@ -3,14 +3,14 @@ import os
 from cv.model import detect_focus
 
 
-IMAGE_PATH = "resources/screens/sameple_frame.jpg"
+IMAGE_PATH = "resources/screens/sample_frame.jpg"
 
 
 def main():
     if not os.path.exists(IMAGE_PATH):
         raise FileNotFoundError(f"Image not found: {IMAGE_PATH}")
 
-    # Load image (this simulates a single video frame)
+    # Load image (simulates a single video frame)
     frame = cv2.imread(IMAGE_PATH)
 
     if frame is None:
@@ -26,7 +26,15 @@ def main():
         print("❌ No focus detected")
 
     cv2.imshow("Focus Detection Result", frame)
-    cv2.waitKey(0)
+    print("Press 'q' or 'ESC' to quit")
+
+    # Wait for quit key
+    while True:
+        key = cv2.waitKey(50) & 0xFF
+        if key == ord('q') or key == 27:  # 27 = ESC
+            print("Exiting...")
+            break
+
     cv2.destroyAllWindows()
 
 

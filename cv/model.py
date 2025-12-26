@@ -2,45 +2,56 @@ import cv2
 import numpy as np
 
 
-def detect_focus(frame):
+def detect_focus(frame, debug=False):
     """
-    Detect focused / highlighted UI element from a single frame.
-
-    Returns:
-        (x, y, w, h) or None
+    Detect focused element based on WHITE BACKGROUND dominance.
+    Returns (x, y, w, h) or None
     """
 
-    # Convert to HSV
+    # 1️⃣ Convert to HSV
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    # Highlight detection (bright, low saturation)
-    lower = np.array([0, 0, 180])
-    upper = np.array([180, 80, 255])
-    mask = cv2.inRange(hsv, lower, upper)
+    # 2️⃣ Detect near-white colors (low saturation, high value)
+    lower_white = np.array([0, 0, 200])
+    upper_white = np.array([180, 40, 255])
+    white_mask = cv2.inRange(hsv, lower_white, upper_white)
 
-    # Morphological cleanup
-    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (7, 7))
-    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
-    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    # 3️⃣ Morphology to form solid regions
+    kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (9, 9))
+    white_mask = cv2.morphologyEx(white_mask, cv2.MORPH_CLOSE, kernel)
+    white_mask = cv2.morphologyEx(white_mask, cv2.MORPH_OPEN, kernel)
 
-    # Find contours
+    # 4️⃣ Find contours
     contours, _ = cv2.findContours(
-        mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
+        white_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
     )
 
     if not contours:
         return None
 
-    contours = sorted(contours, key=cv2.contourArea, reverse=True)
+    best_candidate = None
+    best_score = 0
 
     for cnt in contours:
         x, y, w, h = cv2.boundingRect(cnt)
         area = w * h
 
-        # Ignore small noise
-        if area < 2000:
+        # Ignore tiny white areas (icons, text)
+        if area < 1500:
             continue
 
-        return (x, y, w, h)
+        # Aspect ratio filter (focused tabs are wide, not square)
+        aspect_ratio = w / float(h)
+        if aspect_ratio < 1.5:
+            continue
 
-    return None
+        # Calculate white pixel density
+        roi = white_mask[y:y+h, x:x+w]
+        white_ratio = cv2.countNonZero(roi) / float(area)
+
+        # Focused background is mostly white
+        if white_ratio > best_score:
+            best_score = white_ratio
+            best_candidate = (x, y, w, h)
+
+    return best_candidate
