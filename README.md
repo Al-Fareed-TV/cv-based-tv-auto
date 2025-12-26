@@ -5,10 +5,6 @@ This repo is intended to automate TV flows using Computer vision
 
 Target Application: **Sony LIV**
 
-![Image](https://miro.medium.com/1%2ARhoswqBl8LAx84a1YrzQBg.jpeg)
-
-![Image](https://www.switcherstudio.com/hs-fs/hubfs/4-%20transmitter.receiver.monitor%20.png?height=495\&name=4-+transmitter.receiver.monitor+.png\&width=728)
-
 ![Image](https://blog.roboflow.com/content/images/2023/05/data-src-image-7b019a68-485b-4aef-be18-21388ec414ee.png)
 
 ---
@@ -67,19 +63,15 @@ It describes **what must be built and how the system should behave**, serving as
 ## 4. High-Level System Design
 
 ```
-Live Video Feed (Camera / HDMI)
+Live Camera / Image
         ↓
-Frame Sampling
+Single Frame (image)
         ↓
-Computer Vision Perception
+LLM Vision Call
         ↓
-Structured UI State
+Structured Focus Result (JSON)
         ↓
-Flow Executor (Predefined Steps)
-        ↓
-Remote Control Actions
-        ↓
-Visual Assertions
+Deterministic Navigation Logic
 ```
 
 The system is **closed-loop**:
