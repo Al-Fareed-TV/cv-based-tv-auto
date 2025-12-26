@@ -16,12 +16,14 @@ def main():
     if frame is None:
         raise RuntimeError("Failed to load image")
 
-    bbox = detect_focus(frame)
+    result = detect_focus(frame)
 
-    if bbox:
-        x, y, w, h = bbox
+    if result and result.get("bbox"):
+        x, y, w, h = result["bbox"]
         cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 3)
-        print(f"✅ Focus detected at: {bbox}")
+        print(f"✅ Focus detected at: {result['bbox']}")
+        print(f"   Confidence: {result.get('confidence', 'N/A')}")
+        print(f"   Method: {result.get('method', 'N/A')}")
     else:
         print("❌ No focus detected")
 
