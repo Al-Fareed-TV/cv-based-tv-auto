@@ -1,0 +1,6 @@
+opencv-python
+numpy
+pillow
+google-genai
+python-dotenv
+websocket-client
