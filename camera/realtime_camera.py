@@ -22,13 +22,13 @@ class RealTimeCamera:
         self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
 
         if not self.cap.isOpened():
-            raise RuntimeError("❌ Unable to open RTSP stream")
+            raise RuntimeError("Unable to open RTSP stream")
 
         self.running = True
         self.thread = threading.Thread(target=self._update, daemon=True)
         self.thread.start()
 
-        print("✅ Real-time camera started")
+        print("Camera started")
 
     def _update(self):
         while self.running:
@@ -38,7 +38,7 @@ class RealTimeCamera:
                 continue
 
             with self.lock:
-                self.frame = frame  # overwrite old frame
+                self.frame = frame
 
     def read(self):
         with self.lock:
@@ -52,4 +52,4 @@ class RealTimeCamera:
             self.thread.join(timeout=1)
         if self.cap:
             self.cap.release()
-        print("🛑 Camera stopped")
+        print("Camera stopped")
