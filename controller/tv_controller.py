@@ -1,99 +1,85 @@
-import time
+import websocket
+import ssl
 import json
+import base64
 import os
-from camera.realtime_camera import RealTimeCamera
-from cv.llm_focus_detector import detect_focus_with_gemini
-from google import genai
+import threading
+import time
+
+TV_IP = "192.168.1.85"     # 🔴 CHANGE IF NEEDED
+TV_PORT = 8002
+APP_NAME = "PythonRemote"
+TOKEN_FILE = "tv-token.txt"
 
 
-class TVController:
-    """
-    Orchestrates:
-    Camera → Focus Detection → Navigation Decision → Execution
-    """
+class SamsungRemote:
+    def __init__(self):
+        self.token = self._load_token()
+        self.ws = None
 
-    def __init__(self, camera_source, flow_prompt):
-        self.camera = RealTimeCamera(camera_source)
-        self.flow_prompt = flow_prompt
-        self.client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+    def _load_token(self):
+        if os.path.exists(TOKEN_FILE):
+            return open(TOKEN_FILE).read().strip()
+        return ""
 
-        self.last_llm_call = 0
-        self.llm_interval = 2.0  # seconds
+    def _save_token(self, token):
+        with open(TOKEN_FILE, "w") as f:
+            f.write(token)
 
-    def start(self):
-        self.camera.start()
+    def connect(self):
+        encoded_name = base64.b64encode(APP_NAME.encode()).decode()
 
-        try:
-            while True:
-                ret, frame = self.camera.read()
-                if not ret:
-                    continue
-
-                now = time.time()
-                if now - self.last_llm_call < self.llm_interval:
-                    continue
-
-                self.last_llm_call = now
-
-                # 1️⃣ Detect focus via Gemini Vision
-                focus = detect_focus_with_gemini(frame)
-                current_focus = focus["focused_element"]["label"]
-
-                print("FOCUS:", current_focus)
-
-                # 2️⃣ Decide next navigation
-                decision = self._decide_navigation(current_focus)
-                print("DECISION:", decision)
-
-                # 3️⃣ Execute navigation
-                self._execute(decision["next_action"])
-
-                if decision["next_action"] == "NONE":
-                    print("Flow completed")
-                    break
-
-        finally:
-            self.camera.stop()
-
-    def _decide_navigation(self, current_focus):
-        prompt = f"""
-You are navigating a Smart TV UI.
-
-Goal:
-{self.flow_prompt}
-
-Current focused element:
-{current_focus}
-
-Decide the NEXT navigation step.
-
-Rules:
-- Valid actions: UP, DOWN, LEFT, RIGHT, ENTER, NONE
-- Return ONLY ONE action
-- Stop when goal is achieved
-
-Respond ONLY in JSON:
-{{
-  "current_focus": "{current_focus}",
-  "next_action": "UP|DOWN|LEFT|RIGHT|ENTER|NONE",
-  "confidence": 0.0-1.0
-}}
-"""
-
-        response = self.client.models.generate_content(
-            model="gemini-1.0-pro",
-            contents=[prompt]
+        ws_url = (
+            f"wss://{TV_IP}:{TV_PORT}/api/v2/channels/samsung.remote.control"
+            f"?name={encoded_name}"
         )
 
-        text = response.text.strip()
-        start = text.find("{")
-        end = text.rfind("}") + 1
-        return json.loads(text[start:end])
+        if self.token:
+            ws_url += f"&token={self.token}"
 
-    def _execute(self, action):
-        if action == "NONE":
-            return
+        self.ws = websocket.WebSocketApp(
+            ws_url,
+            on_open=self._on_open,
+            on_message=self._on_message,
+            on_error=self._on_error
+        )
 
-        # Stub: replace with IR / HDMI-CEC / ADB
-        print(f"EXECUTE: {action}")
-        time.sleep(0.8)
+        thread = threading.Thread(
+            target=self.ws.run_forever,
+            kwargs={"sslopt": {"cert_reqs": ssl.CERT_NONE}},
+            daemon=True
+        )
+        thread.start()
+
+        time.sleep(2)  # allow handshake
+
+    def _on_open(self, ws):
+        print("✅ Connected to Samsung TV")
+
+    def _on_message(self, ws, message):
+        msg = json.loads(message)
+        print("📩 TV:", msg)
+
+        if msg.get("data", {}).get("token"):
+            self.token = msg["data"]["token"]
+            self._save_token(self.token)
+            print("🔐 Token saved")
+
+    def _on_error(self, ws, error):
+        print("❌ WebSocket error:", error)
+
+    def send_key(self, key):
+        payload = {
+            "method": "ms.remote.control",
+            "params": {
+                "Cmd": "Click",
+                "DataOfCmd": key,
+                "Option": "false",
+                "TypeOfRemote": "SendRemoteKey"
+            }
+        }
+
+        if self.ws:
+            self.ws.send(json.dumps(payload))
+            print("➡️ Sent:", key)
+            time.sleep(0.3)  # debounce

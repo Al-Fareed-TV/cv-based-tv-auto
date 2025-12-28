@@ -43,7 +43,7 @@ Return ONLY valid JSON:
 """
 
     response = client.models.generate_content(
-        model="gemini-1.0-pro-vision", contents=[prompt, image]
+        model="gemini-2.5-flash", contents=[prompt, image]
     )
 
     text = response.text.strip()
