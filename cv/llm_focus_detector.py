@@ -1,21 +1,29 @@
 import os
 import json
+import tempfile
 from PIL import Image
 from google import genai
 from dotenv import load_dotenv
 
-# 👇 THIS loads .env into os.environ
 load_dotenv()
 
 
-def detect_focus_with_gemini(image_path):
+def detect_focus_with_gemini(frame):
+    """
+    Takes a numpy frame, sends ONE image to Gemini Vision,
+    returns focused element info.
+    """
+
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        raise RuntimeError("GEMINI_API_KEY environment variable not set")
+        raise RuntimeError("GEMINI_API_KEY not set")
 
     client = genai.Client(api_key=api_key)
 
-    image = Image.open(image_path)
+    # Save frame temporarily
+    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+        Image.fromarray(frame).save(tmp.name)
+        image = Image.open(tmp.name)
 
     prompt = """
 You are analyzing a Smart TV application UI.
@@ -24,7 +32,7 @@ Exactly ONE UI element is currently focused.
 Focused elements have a visually distinct background or emphasis
 (such as a white background, highlighted container, or enlargement).
 
-Return ONLY valid JSON in this format:
+Return ONLY valid JSON:
 {
   "focused_element": {
     "label": "<string or null>",
@@ -32,12 +40,10 @@ Return ONLY valid JSON in this format:
     "confidence": 0.0-1.0
   }
 }
-Do not add any text outside JSON.
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=[prompt, image]
+        model="gemini-1.0-pro-vision", contents=[prompt, image]
     )
 
     text = response.text.strip()
