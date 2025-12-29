@@ -6,6 +6,7 @@ from camera.realtime_camera import RealTimeCamera
 from cv.llm_focus_detector import detect_focus_with_gemini
 from google import genai
 from dotenv import load_dotenv
+from controller.tv_controller import SamsungRemote  # ✅ NEW
 
 load_dotenv()
 
@@ -13,7 +14,10 @@ load_dotenv()
 
 RTSP_URL = "rtsp://192.168.1.37:1945/"
 SYSTEM_PROMPT_FILE = "prompts/system_flow.txt"
+
 LLM_INTERVAL_SECONDS = 2.0
+KEY_PRESS_DELAY = 0.4          # delay between keys
+POST_ACTION_DELAY = 1.2        # wait for UI to settle
 
 # --------------------------------------- #
 
@@ -22,14 +26,6 @@ def load_text_file(path):
     if not os.path.exists(path):
         raise FileNotFoundError(f"File not found: {path}")
     with open(path, "r") as f:
-        return f.read().strip()
-
-
-def load_flow_prompt(prompt_file):
-    if not os.path.exists(prompt_file):
-        raise FileNotFoundError(f"Prompt file not found: {prompt_file}")
-
-    with open(prompt_file, "r") as f:
         return f.read().strip()
 
 
@@ -45,7 +41,8 @@ Current focused element:
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=[prompt]
+        model="gemini-2.5-flash",
+        contents=[prompt]
     )
 
     text = response.text.strip()
@@ -60,9 +57,20 @@ def parse_args():
         description="TV automation runner using camera + Gemini"
     )
     parser.add_argument(
-        "prompt_file", help="Path to flow prompt file (e.g. tests/remote_test.txt)"
+        "prompt_file",
+        help="Path to flow prompt file (e.g. tests/remote_test.txt)"
     )
     return parser.parse_args()
+
+
+def execute_actions(remote, actions):
+    """
+    Execute a list of remote key actions sequentially.
+    """
+    for key in actions:
+        print(f"🎮 EXECUTING: {key}")
+        remote.send_key(key)
+        time.sleep(KEY_PRESS_DELAY)
 
 
 def main():
@@ -84,6 +92,10 @@ def main():
     camera = RealTimeCamera(RTSP_URL)
     camera.start()
 
+    # ✅ Initialize Samsung Remote
+    remote = SamsungRemote()
+    remote.connect()
+
     last_llm_call = 0
 
     try:
@@ -98,20 +110,42 @@ def main():
 
             last_llm_call = now
 
+            # 1️⃣ Detect current focus
             focus_result = detect_focus_with_gemini(frame)
             focused_element = focus_result["focused_element"]
             focus_label = focused_element.get("label")
 
+            print("\n🎯 CURRENT FOCUS:")
+            print(focused_element)
+
+            # 2️⃣ Ask LLM for next step
             decision = decide_next_action(
-                client, system_prompt, flow_prompt, focus_label
+                client,
+                system_prompt,
+                flow_prompt,
+                focus_label
             )
 
-            print("🧭 NAVIGATION DECISION:")
+            print("🧭 LLM DECISION:")
             print(decision)
 
-            if decision["next_action"] == "NONE":
-                print("✅ Flow completed")
+            next_action = decision["next_action"]
+
+            # 3️⃣ Check completion
+            if next_action == "NONE":
+                print("✅ Flow completed by LLM")
                 break
+
+            # 4️⃣ Execute returned actions
+            if isinstance(next_action, list):
+                execute_actions(remote, next_action)
+            else:
+                raise ValueError(
+                    f"Invalid next_action format: {next_action}"
+                )
+
+            # 5️⃣ Wait for UI to update before next frame
+            time.sleep(POST_ACTION_DELAY)
 
     finally:
         camera.stop()
