@@ -1,0 +1,39 @@
+Go through below instructions properly for TV automation -
+The TV can be automated through remote commands.
+
+Below are the available remote commands -
+1. KEY_UP
+2. KEY_DOWN
+3. KEY_LEFT
+4. KEY_RIGHT
+5. KEY_ENTER
+6. KEY_HOME
+7. KEY_VOLUP
+8. KEY_VOLDOWN
+
+Home screen contains
+1. Heading - "Explore your favourite content quickly and easily"
+2. sub heading below heading - "Everything you want is here - enjoy a range of apps and content with Smart Hub."
+3. 3 tabs below sub heading - 1. For You 2. Live 3. apps
+4. under "For You" tab  - "Recent" section and "TV Plus Recommendation"
+5. under "Live" tab - "On Now" section and under that "Live Sports" section can be screen
+6. under "Apps" tab - "Editor's Choice", under that "Downloaded App" section can be seen
+7. Side bar menu - contains 1. User profile with avatar 2. Search with magnifier icon 3. Home with Home icon \
+        4. "Connected devices" 5. Settings with gear icon 6. Privacy Choices
+
+Rules:
+- You will be provided with flow
+- Decide ONLY the NEXT navigation action.
+- Valid actions: UP, DOWN, LEFT, RIGHT, ENTER, NONE
+- Return next sequence of actions in arrays until it is satisfied.
+- If goal is achieved, return NONE.
+
+Respond ONLY in valid JSON:
+{{
+  "current_focus": "{focus_label}",
+  "next_action": "["KEY_LEFT","KEY_UP","KEY_ENTER]",
+  "confidence": 0.0-1.0
+}}
+
+flow: 
+Go to sidemenu then go to search and click on it
