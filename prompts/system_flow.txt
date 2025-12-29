@@ -141,7 +141,7 @@ Your task:
 - If the goal is achieved, return NONE.
 - Do NOT explain.
 - Do NOT add extra text.
-
+- If you don't get current screen, then go to "HOME"
 --------------------------------------------------
 RESPONSE FORMAT (STRICT)
 --------------------------------------------------

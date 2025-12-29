@@ -2,6 +2,8 @@ import time
 import json
 import os
 import argparse
+from datetime import datetime
+
 from camera.realtime_camera import RealTimeCamera
 from cv.llm_focus_detector import detect_focus_with_gemini
 from google import genai
@@ -20,6 +22,15 @@ KEY_PRESS_DELAY = 0.4          # delay between keys
 POST_ACTION_DELAY = 1.2        # wait for UI to settle
 
 # --------------------------------------- #
+
+
+def log_event(step_id: int, message: str) -> None:
+    """
+    Structured console logging for LLM decision boundaries.
+    Logs only when a frame is selected for LLM processing.
+    """
+    ts = datetime.now().strftime("%H:%M:%S.%f")[:-3]
+    print(f"[{ts}] [STEP {step_id}] {message}")
 
 
 def load_text_file(path):
@@ -97,6 +108,7 @@ def main():
     remote.connect()
 
     last_llm_call = 0
+    step_id = 0  # monotonically increasing step counter for LLM decision cycles
 
     try:
         while True:
@@ -110,21 +122,30 @@ def main():
 
             last_llm_call = now
 
-            # 1️⃣ Detect current focus
+            # 1️⃣ Frame selected for LLM processing
+            step_id += 1
+            log_event(step_id, "Frame selected for LLM processing")
+
+            # 2️⃣ Vision LLM – focus detection
+            log_event(step_id, "Sending frame to Vision LLM for focus detection")
             focus_result = detect_focus_with_gemini(frame)
+            log_event(step_id, "Received focus detection result")
+
             focused_element = focus_result["focused_element"]
             focus_label = focused_element.get("label")
 
             print("\n🎯 CURRENT FOCUS:")
             print(focused_element)
 
-            # 2️⃣ Ask LLM for next step
+            # 3️⃣ Text LLM – navigation decision
+            log_event(step_id, "Sending context to Text LLM for navigation decision")
             decision = decide_next_action(
                 client,
                 system_prompt,
                 flow_prompt,
                 focus_label
             )
+            log_event(step_id, f"Received navigation decision: {decision['next_action']}")
 
             print("🧭 LLM DECISION:")
             print(decision)

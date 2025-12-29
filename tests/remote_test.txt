@@ -1,1 +1,3 @@
-Go to the side menu, then navigate to Search and click on it.
+1. Go to side menu.
+2. navigate to Search menu and click on it.
+3. If you are in Search page, then return NONE
