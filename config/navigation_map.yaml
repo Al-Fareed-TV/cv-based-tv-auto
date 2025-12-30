@@ -8,8 +8,7 @@
   Live:
     keys: [KEY_RIGHT]
 
-  Apps:
-    keys: [KEY_RIGHT, KEY_RIGHT]
+
 
 
 "Live":
