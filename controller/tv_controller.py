@@ -6,7 +6,7 @@ import os
 import threading
 import time
 
-TV_IP = "192.168.1.85"     # 🔴 CHANGE IF NEEDED
+TV_IP = "192.168.1.38"     # 🔴 CHANGE IF NEEDED
 TV_PORT = 8002
 APP_NAME = "PythonRemote"
 TOKEN_FILE = "tv-token.txt"
