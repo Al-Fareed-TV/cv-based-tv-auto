@@ -8,7 +8,8 @@ from camera.realtime_camera import RealTimeCamera
 from cv.llm_focus_detector import detect_focus_with_gemini
 from google import genai
 from dotenv import load_dotenv
-from controller.tv_controller import SamsungRemote  # ✅ NEW
+from controller.tv_controller import SamsungRemote 
+from utils.logger import log_event
 
 load_dotenv()
 
@@ -22,15 +23,6 @@ KEY_PRESS_DELAY = 0.4          # delay between keys
 POST_ACTION_DELAY = 1.2        # wait for UI to settle
 
 # --------------------------------------- #
-
-
-def log_event(step_id: int, message: str) -> None:
-    """
-    Structured console logging for LLM decision boundaries.
-    Logs only when a frame is selected for LLM processing.
-    """
-    ts = datetime.now().strftime("%H:%M:%S.%f")[:-3]
-    print(f"[{ts}] [STEP {step_id}] {message}")
 
 
 def load_text_file(path):
