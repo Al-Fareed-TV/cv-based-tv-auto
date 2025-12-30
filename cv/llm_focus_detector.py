@@ -9,11 +9,6 @@ load_dotenv()
 
 
 def detect_focus_with_gemini(frame):
-    """
-    Takes a numpy frame, sends ONE image to Gemini Vision,
-    returns focused element info.
-    """
-
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY not set")
@@ -37,13 +32,12 @@ Return ONLY valid JSON:
   "focused_element": {
     "label": "<string or null>",
     "bbox": [x, y, width, height],
-    "confidence": 0.0-1.0
   }
 }
 """
 
     response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=[prompt, image]
+        model=os.getenv("LLM_MODEL"), contents=[prompt, image]
     )
 
     text = response.text.strip()

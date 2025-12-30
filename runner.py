@@ -15,12 +15,10 @@ load_dotenv()
 
 # ---------------- CONFIG ---------------- #
 
-RTSP_URL = "rtsp://192.168.1.37:1945/"
-SYSTEM_PROMPT_FILE = "prompts/system_flow.txt"
-
-LLM_INTERVAL_SECONDS = 2.0
-KEY_PRESS_DELAY = 0.4          # delay between keys
-POST_ACTION_DELAY = 1.2        # wait for UI to settle
+RTSP_URL = os.getenv("RTSP_URL")
+LLM_INTERVAL_SECONDS = os.getenv("LLM_INTERVAL_SECONDS")
+KEY_PRESS_DELAY = os.getenv("KEY_PRESS_DELAY")  
+POST_ACTION_DELAY = os.getenv("POST_ACTION_DELAY") 
 
 # --------------------------------------- #
 
@@ -85,7 +83,7 @@ def main():
 
     client = genai.Client(api_key=api_key)
 
-    system_prompt = load_text_file(SYSTEM_PROMPT_FILE)
+    system_prompt = load_text_file("prompts/system_flow.txt")
     flow_prompt = load_text_file(args.prompt_file)
 
     print("📜 Loaded system prompt")

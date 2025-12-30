@@ -2,10 +2,6 @@ import cv2
 import threading
 import time
 class RealTimeCamera:
-    """
-    Hard real-time camera reader.
-    Always keeps ONLY the latest frame.
-    """
 
     def __init__(self, source):
         self.source = source

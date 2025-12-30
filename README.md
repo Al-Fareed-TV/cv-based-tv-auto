@@ -257,13 +257,6 @@ It prioritizes:
 
 The repository exists to **guide implementation**, not to contain it.
 
----
-
-If you want next, I can:
-
-* Rewrite this for **even more AI-friendly language**
-* Add a **“System Assumptions”** section
-* Add a **“State Representation Contract”**
-* Produce a **separate SYSTEM_PROMPT.md** for another model
-
-Just tell me.
+## Set up
+1. clone this repo
+2. run ```pip install -r requirements.txt```

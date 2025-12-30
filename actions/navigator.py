@@ -1,11 +1,8 @@
 import yaml
 import os
 
-
 class NavigationNotFound(Exception):
     pass
-
-
 class Navigator:
     def __init__(self, nav_map_path):
         if not os.path.exists(nav_map_path):
