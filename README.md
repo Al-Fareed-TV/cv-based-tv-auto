@@ -5,8 +5,6 @@ This repo is intended to automate TV flows using Computer vision
 
 Target Application: **Sony LIV**
 
-![Image](https://blog.roboflow.com/content/images/2023/05/data-src-image-7b019a68-485b-4aef-be18-21388ec414ee.png)
-
 ---
 
 ## 1. Objective of This Repository
