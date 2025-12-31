@@ -1,5 +1,5 @@
 import os
-from core.context import AutomationContext
+from core.context import DriverContext
 from dotenv import load_dotenv
 
 
@@ -9,7 +9,7 @@ load_dotenv()
 RTSP_URL = os.getenv("RTSP_URL")
 
 def test_search():
-    ctx = AutomationContext(RTSP_URL)
+    ctx = DriverContext(RTSP_URL)
     ctx.start()
     try: 
         ctx.goto("Search")

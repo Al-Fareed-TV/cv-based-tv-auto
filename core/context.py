@@ -6,7 +6,7 @@ from cv.llm_focus_detector import detect_focus_with_gemini
 from utils.logger import log_event
 
 
-class AutomationContext:
+class DriverContext:
     def __init__(
         self,
         rtsp_url,
