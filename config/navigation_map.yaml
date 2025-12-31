@@ -1,14 +1,24 @@
 "For You":
-  Search:
-    keys: [KEY_LEFT, KEY_UP, KEY_ENTER]
-
   Home:
-    keys: [KEY_LEFT, KEY_ENTER]
+    keys: [KEY_LEFT]
 
   Live:
     keys: [KEY_RIGHT]
 
+  Apps:
+    keys: [KEY_RIGHT, KEY_RIGHT]
 
+  Sony LIV:
+    keys: [KEY_RIGHT, KEY_RIGHT, KEY_DOWN, KEY_DOWN]
+
+  Search:
+    keys: [KEY_LEFT, KEY_UP]
+
+  Search Input:
+    keys: [KEY_LEFT, KEY_UP, KEY_ENTER, KEY_UP]
+
+  Settings:
+    keys: [KEY_LEFT, KEY_DOWN, KEY_DOWN]
 
 
 "Live":
@@ -18,8 +28,17 @@
   Apps:
     keys: [KEY_RIGHT]
 
+  Sony LIV:
+    keys: [KEY_RIGHT, KEY_DOWN, KEY_DOWN]
+
   Search:
-    keys: [KEY_LEFT, KEY_UP, KEY_ENTER]
+    keys: [KEY_LEFT, KEY_LEFT, KEY_UP]
+
+  Search Input:
+    keys: [KEY_LEFT, KEY_LEFT, KEY_ENTER, KEY_UP, KEY_UP]
+
+  Settings:
+    keys: [KEY_LEFT, KEY_LEFT, KEY_DOWN, KEY_DOWN]
 
 
 "Apps":
@@ -29,38 +48,68 @@
   Live:
     keys: [KEY_LEFT]
 
+  Sony LIV:
+    keys: [KEY_DOWN, KEY_DOWN]
+
   Search:
-    keys: [KEY_LEFT, KEY_UP, KEY_ENTER]
+    keys: [KEY_LEFT, KEY_LEFT, KEY_LEFT, KEY_UP]
+
+  Search Input:
+    keys: [KEY_LEFT, KEY_LEFT, KEY_LEFT, KEY_UP, KEY_ENTER, KEY_UP]
+
+  Settings:
+    keys: [KEY_LEFT, KEY_LEFT, KEY_LEFT, KEY_DOWN, KEY_DOWN]
 
 
 "Home":
   Search:
-    keys: [KEY_UP, KEY_ENTER]
+    keys: [KEY_UP]
+
+  Sony LIV:
+    keys: [KEY_RIGHT, KEY_RIGHT, KEY_RIGHT, KEY_DOWN, KEY_DOWN]
 
   Connected Devices:
-    keys: [KEY_DOWN, KEY_ENTER]
+    keys: [KEY_DOWN]
 
   Settings:
-    keys: [KEY_DOWN, KEY_DOWN, KEY_ENTER]
+    keys: [KEY_DOWN, KEY_DOWN]
 
   Privacy Choices:
-    keys: [KEY_DOWN, KEY_DOWN, KEY_DOWN, KEY_ENTER]
+    keys: [KEY_DOWN, KEY_DOWN, KEY_DOWN]
+
+  Search Input:
+    keys: [KEY_UP, KEY_ENTER, KEY_UP]
 
 
 "Search":
   Search Input:
-    keys: [KEY_UP, KEY_ENTER]
+    keys: [KEY_ENTER, KEY_UP]
 
 
 "Recently Viewed":
   Search Input:
-    keys: [KEY_UP, KEY_ENTER]
+    keys: [KEY_UP]
 
-
-"Search Input":
-  Virtual Keyboard:
-    keys: [KEY_ENTER]
 
 "Downloaded App":
   Sony LIV:
-    keys: [KEY_DOWN,KEY_DOWN,KEY_ENTER]
+    keys: [KEY_DOWN, KEY_DOWN]
+
+
+"Settings":
+  Profile:
+   keys: [KEY_UP, KEY_UP, KEY_UP, KEY_UP]
+
+  Search:
+    keys: [KEY_UP, KEY_UP, KEY_UP]
+
+  Home:
+    keys: [KEY_UP, KEY_UP, KEY_RIGHT]
+
+  Sony LIV:
+    keys: [KEY_UP, KEY_UP, KEY_RIGHT, KEY_RIGHT, KEY_RIGHT, KEY_DOWN, KEY_DOWN]
+
+
+"Sony LIV":
+  Apps:
+    keys: [KEY_UP, KEY_UP]
