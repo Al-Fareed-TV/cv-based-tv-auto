@@ -10,7 +10,6 @@ class AutomationContext:
     def __init__(
         self,
         rtsp_url,
-        nav_map_path,
         camera_enabled=True
     ):
         self.step = 0
@@ -21,7 +20,7 @@ class AutomationContext:
         self.camera = (
             RealTimeCamera(rtsp_url) if camera_enabled else None
         )
-
+    nav_map_path = "config/navigation_map.yaml"
     def start(self):
         self.remote.connect()
         if self.camera:
@@ -31,19 +30,35 @@ class AutomationContext:
         if self.camera:
             self.camera.stop()
 
-    def get_focus(self):
+    def get_focus(self, timeout=5.0):
+        """
+        Waits until a frame is available, then calls Gemini
+        to detect focused element.
+        """
         if not self.camera:
             return None
 
-        ret, frame = self.camera.read()
-        if not ret:
-            return None
+        start_time = time.time()
+
+        while True:
+            ret, frame = self.camera.read()
+            if ret and frame is not None:
+                break
+
+            if time.time() - start_time > timeout:
+                raise RuntimeError("Timeout waiting for camera frame")
+
+            time.sleep(0.05)  # short wait before retry
 
         self.step += 1
         log_event(self.step, "Sending frame to LLM for focus detection")
 
         result = detect_focus_with_gemini(frame)
+        print("\n\n----------------------- Focus found", result,
+            "\n\n-------------------")
+
         return result["focused_element"]["label"]
+
 
 
     def goto(self, destination):
