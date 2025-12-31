@@ -2,7 +2,7 @@ import time
 from camera.realtime_camera import RealTimeCamera
 from controller.tv_controller import SamsungRemote
 from actions.navigator import Navigator
-from cv.llm_focus_detector import assert_screen_with_llm, detect_focus_with_gemini, assert_screen
+from cv.llm_focus_detector import assert_screen_with_llm, detect_focus_with_gemini
 from utils.logger import log_event
 class DriverContext:
     def __init__(self, rtsp_url, camera_enabled=True):
@@ -73,10 +73,16 @@ class DriverContext:
         log_event(self.step, f"PRESS {key}")
         self.remote.send_key(f"KEY_{key}")
 
-    def long_press(self, key, duration=4):
+    def long_press(self, key, duration=3, interval=0.0):
         log_event(self.step, f"LONG_PRESS {key} ({duration}s)")
-        self.remote.send_key(f"KEY_{key}")
-        time.sleep(duration)
+
+        end_time = time.time() + duration
+        remote_key = f"KEY_{key}"
+
+        while time.time() < end_time:
+            self.remote.send_key(remote_key)
+            time.sleep(interval)
+
 
     def type(self, text):
         log_event(self.step, f"TYPE '{text}'")

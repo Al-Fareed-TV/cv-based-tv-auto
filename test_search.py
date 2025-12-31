@@ -12,8 +12,10 @@ def test_search():
     ctx = DriverContext(RTSP_URL)
     ctx.start()
     try: 
-        ctx.goto("Search")
-        ctx.press("ENTER")
+        ctx.goto("Sony LIV")
+        ctx.long_press("ENTER")
+        # isAppsSceenDisplayed =  ctx.assert_screen("Am I in Apps tab?")
+        # print("Is user viewing app screen",isAppsSceenDisplayed)
     finally:
         ctx.shutdown()
         
