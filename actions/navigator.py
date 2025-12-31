@@ -1,14 +1,16 @@
-from dotenv import load_dotenv
 import yaml
 import os
 import time
-load_dotenv()
+
+
 class NavigationNotFound(Exception):
     pass
 
+
 class Navigator:
-    def __init__(self, executor):
-        nav_map_path = "config/navigation_map.yaml"
+    def __init__(self, executor, nav_map_path="config/navigation_map.yaml"):
+        if not executor:
+            raise ValueError("Navigator requires an executor")
 
         if not os.path.exists(nav_map_path):
             raise FileNotFoundError(nav_map_path)
@@ -24,20 +26,13 @@ class Navigator:
                 f"No navigation defined for focus: {current_focus}"
             )
 
-        dest_map = self.nav_map[current_focus]
-
-        if destination not in dest_map:
+        if destination not in self.nav_map[current_focus]:
             raise NavigationNotFound(
                 f"No navigation path from {current_focus} to {destination}"
             )
 
-        actions = dest_map[destination]["keys"]
+        keys = self.nav_map[current_focus][destination]["keys"]
 
-        self._execute_actions(actions, delay)
-
-        return actions  # optional, useful for logging/debug
-
-    def _execute_actions(self, actions, delay):
-        for action in actions:
-                self.executor.send_key(action)
-                time.sleep(delay)
+        for key in keys:
+            self.executor.send_key(key)
+            time.sleep(delay)
