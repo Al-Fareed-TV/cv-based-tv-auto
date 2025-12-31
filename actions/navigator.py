@@ -1,11 +1,14 @@
+from dotenv import load_dotenv
 import yaml
 import os
 import time
+load_dotenv()
 class NavigationNotFound(Exception):
     pass
 
 class Navigator:
-    def __init__(self, nav_map_path, executor):
+    def __init__(self, executor):
+        nav_map_path = "config/navigation_map.yaml"
 
         if not os.path.exists(nav_map_path):
             raise FileNotFoundError(nav_map_path)

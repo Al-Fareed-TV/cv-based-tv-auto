@@ -21,20 +21,26 @@ POST_ACTION_DELAY = os.getenv("POST_ACTION_DELAY")
 
 # --------------------------------------- #
 
-def parse_args():
-    parser = argparse.ArgumentParser(
-        description="TV automation runner using camera + Gemini"
-    )
-    parser.add_argument(
-        "prompt_file",
-        help="Path to flow prompt file (e.g. tests/remote_test.txt)"
-    )
-    return parser.parse_args()
+# def parse_args():
+#     parser = argparse.ArgumentParser(
+#         description="TV automation runner using camera + Gemini"
+#     )
+#     parser.add_argument(
+#         "prompt_file",
+#         help="Path to flow prompt file (e.g. tests/remote_test.txt)"
+#     )
+#     return parser.parse_args()
+
+
+def setup():
+    remote = SamsungRemote();
+    nav = Navigator(remote)
+    remote.connect();
+
 
 def main():
-    NAV_MAP_PATH = "config/navigation_map.yaml"
     remote = SamsungRemote();
-    nav = Navigator(NAV_MAP_PATH,remote)
+    nav = Navigator(remote)
     remote.connect();
 
     api_key = os.getenv("GEMINI_API_KEY")
@@ -45,23 +51,23 @@ def main():
 
     system_prompt = load_text_file("prompts/system_flow.txt")
 
-    # camera = RealTimeCamera(RTSP_URL)
-    # camera.start()
+    camera = RealTimeCamera(RTSP_URL)
+    camera.start()
     
     last_llm_call = 0
     step_id = 0  
     
     try:
         while True:
-            # ret, frame = camera.read()
-            # if not ret:
-            #     continue
+            ret, frame = camera.read()
+            if not ret:
+                continue
 
-            # now = time.time()
-            # if now - last_llm_call < LLM_INTERVAL_SECONDS:
-            #     continue
+            now = time.time()
+            if now - last_llm_call < LLM_INTERVAL_SECONDS:
+                continue
 
-            # last_llm_call = now
+            last_llm_call = now
             IMAGE_PATH = "resources/screens/sample_frame.jpg"
             frame = cv2.imread(IMAGE_PATH)
 
@@ -81,7 +87,7 @@ def main():
             print(focused_element)
 
             # 3️⃣ Text LLM – navigation decision
-            log_event(step_id, "Sending context to Text LLM for navigation decision")
+            log_event(step_id, "Retreiving Navigation")
             next_action = nav.goto("For You","Search",0.5)
 
 
@@ -94,7 +100,7 @@ def main():
             time.sleep(POST_ACTION_DELAY)
 
     finally:
-        print("ho gya")
+        print("✅ Flow completed")
         # camera.stop()
         
 if __name__ == "__main__":
