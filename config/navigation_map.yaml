@@ -11,7 +11,6 @@
   Apps:
     keys: [KEY_RIGHT, KEY_RIGHT]
 
-
 "Live":
   For You:
     keys: [KEY_LEFT]
@@ -22,7 +21,6 @@
   Search:
     keys: [KEY_LEFT, KEY_UP, KEY_ENTER]
 
-
 "Apps":
   For You:
     keys: [KEY_LEFT, KEY_LEFT]
@@ -31,8 +29,7 @@
     keys: [KEY_LEFT]
 
   Search:
-    keys: [KEY_LEFT, KEY_UP, KEY_ENTER]
-
+    keys: [KEY_LEFT, KEY_LEFT, KEY_LEFT, KEY_UP, KEY_ENTER]
 
 "Home":
   Search:
@@ -47,16 +44,13 @@
   Privacy Choices:
     keys: [KEY_DOWN, KEY_DOWN, KEY_DOWN, KEY_ENTER]
 
-
 "Search":
   Search Input:
     keys: [KEY_UP, KEY_ENTER]
 
-
 "Recently Viewed":
   Search Input:
     keys: [KEY_UP, KEY_ENTER]
-
 
 "Search Input":
   Virtual Keyboard:
@@ -64,4 +58,4 @@
 
 "Downloaded App":
   Sony LIV:
-    keys: [KEY_DOWN,KEY_DOWN,KEY_ENTER]
+    keys: [KEY_DOWN, KEY_DOWN, KEY_ENTER]
