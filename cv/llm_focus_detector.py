@@ -8,24 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-def detect_focus_with_gemini(frame):
-    """
-    Takes a numpy frame, sends ONE image to Gemini Vision,
-    returns focused element info.
-    """
-
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY not set")
-
-    client = genai.Client(api_key=api_key)
-
-    # Save frame temporarily
-    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
-        Image.fromarray(frame).save(tmp.name)
-        image = Image.open(tmp.name)
-
-    prompt = """
+def get_focused_element_prompt():
+    return """
 You are analyzing a Smart TV application UI.
 
 Exactly ONE UI element is currently focused.
@@ -37,13 +21,29 @@ Return ONLY valid JSON:
   "focused_element": {
     "label": "<string or null>",
     "bbox": [x, y, width, height],
-    "confidence": 0.0-1.0
   }
 }
 """
 
+def get_assertion_prompt():
+    return """ """
+
+def detect_focus_with_gemini(frame):
+    api_key = os.getenv("GEMINI_API_KEY")
+    if not api_key:
+        raise RuntimeError("GEMINI_API_KEY not set")
+
+    client = genai.Client(api_key=api_key)
+
+    # Save frame temporarily
+    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
+        Image.fromarray(frame).save(tmp.name)
+        image = Image.open(tmp.name)
+
+    prompt = get_focused_element_prompt()
+
     response = client.models.generate_content(
-        model="gemini-2.5-flash", contents=[prompt, image]
+        model=os.getenv("LLM_MODEL"), contents=[prompt, image]
     )
 
     text = response.text.strip()
@@ -51,3 +51,6 @@ Return ONLY valid JSON:
     end = text.rfind("}") + 1
 
     return json.loads(text[start:end])
+
+def assert_screen():
+    print("Asserting")
