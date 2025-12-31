@@ -1,19 +1,17 @@
 import time
-import json
 import os
 import argparse
-from datetime import datetime
-
+import cv2
+from actions.navigator import Navigator
 from camera.realtime_camera import RealTimeCamera
 from cv.llm_focus_detector import detect_focus_with_gemini
 from google import genai
 from dotenv import load_dotenv
-from controller.tv_controller import SamsungRemote 
 from utils.logger import log_event
 from utils.reader import load_text_file
+from controller.tv_controller import SamsungRemote
 
 load_dotenv()
-
 # ---------------- CONFIG ---------------- #
 
 RTSP_URL = os.getenv("RTSP_URL")
@@ -22,30 +20,6 @@ KEY_PRESS_DELAY = os.getenv("KEY_PRESS_DELAY")
 POST_ACTION_DELAY = os.getenv("POST_ACTION_DELAY") 
 
 # --------------------------------------- #
-
-
-def decide_next_action(client, system_prompt, flow_prompt, focus_label):
-    prompt = f"""
-{system_prompt}
-
-Navigation Goal:
-{flow_prompt}
-
-Current focused element:
-{focus_label}
-"""
-
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=[prompt]
-    )
-
-    text = response.text.strip()
-    start = text.find("{")
-    end = text.rfind("}") + 1
-
-    return json.loads(text[start:end])
-
 
 def parse_args():
     parser = argparse.ArgumentParser(
@@ -57,19 +31,11 @@ def parse_args():
     )
     return parser.parse_args()
 
-
-def execute_actions(remote, actions):
-    """
-    Execute a list of remote key actions sequentially.
-    """
-    for key in actions:
-        print(f"🎮 EXECUTING: {key}")
-        remote.send_key(key)
-        time.sleep(KEY_PRESS_DELAY)
-
-
 def main():
-    args = parse_args()
+    NAV_MAP_PATH = "config/navigation_map.yaml"
+    remote = SamsungRemote();
+    nav = Navigator(NAV_MAP_PATH,remote)
+    remote.connect();
 
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
@@ -78,29 +44,26 @@ def main():
     client = genai.Client(api_key=api_key)
 
     system_prompt = load_text_file("prompts/system_flow.txt")
-    flow_prompt = load_text_file(args.prompt_file)
 
-    camera = RealTimeCamera(RTSP_URL)
-    camera.start()
-
-    # ✅ Initialize Samsung Remote
-    remote = SamsungRemote()
-    remote.connect()
-
+    # camera = RealTimeCamera(RTSP_URL)
+    # camera.start()
+    
     last_llm_call = 0
-    step_id = 0  # monotonically increasing step counter for LLM decision cycles
-
+    step_id = 0  
+    
     try:
         while True:
-            ret, frame = camera.read()
-            if not ret:
-                continue
+            # ret, frame = camera.read()
+            # if not ret:
+            #     continue
 
-            now = time.time()
-            if now - last_llm_call < LLM_INTERVAL_SECONDS:
-                continue
+            # now = time.time()
+            # if now - last_llm_call < LLM_INTERVAL_SECONDS:
+            #     continue
 
-            last_llm_call = now
+            # last_llm_call = now
+            IMAGE_PATH = "resources/screens/sample_frame.jpg"
+            frame = cv2.imread(IMAGE_PATH)
 
             # 1️⃣ Frame selected for LLM processing
             step_id += 1
@@ -119,38 +82,20 @@ def main():
 
             # 3️⃣ Text LLM – navigation decision
             log_event(step_id, "Sending context to Text LLM for navigation decision")
-            decision = decide_next_action(
-                client,
-                system_prompt,
-                flow_prompt,
-                focus_label
-            )
-            log_event(step_id, f"Received navigation decision: {decision['next_action']}")
+            next_action = nav.goto("For You","Search",0.5)
 
-            print("🧭 LLM DECISION:")
-            print(decision)
-
-            next_action = decision["next_action"]
 
             # 3️⃣ Check completion
             if next_action == "NONE":
                 print("✅ Flow completed by LLM")
                 break
 
-            # 4️⃣ Execute returned actions
-            if isinstance(next_action, list):
-                execute_actions(remote, next_action)
-            else:
-                raise ValueError(
-                    f"Invalid next_action format: {next_action}"
-                )
-
             # 5️⃣ Wait for UI to update before next frame
             time.sleep(POST_ACTION_DELAY)
 
     finally:
-        camera.stop()
-
-
+        print("ho gya")
+        # camera.stop()
+        
 if __name__ == "__main__":
     main()

@@ -19,7 +19,7 @@ class SamsungRemote:
     def __init__(self):
         self.token = self._load_token()
         self.ws = None
-        self.authorized = threading.Event()  # ✅ NEW
+        self.authorized = threading.Event() 
 
     def _load_token(self):
         if os.path.exists(TOKEN_FILE):
