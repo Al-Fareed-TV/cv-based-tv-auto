@@ -10,6 +10,7 @@ from google import genai
 from dotenv import load_dotenv
 from controller.tv_controller import SamsungRemote 
 from utils.logger import log_event
+from utils.reader import load_text_file
 
 load_dotenv()
 
@@ -21,13 +22,6 @@ KEY_PRESS_DELAY = os.getenv("KEY_PRESS_DELAY")
 POST_ACTION_DELAY = os.getenv("POST_ACTION_DELAY") 
 
 # --------------------------------------- #
-
-
-def load_text_file(path):
-    if not os.path.exists(path):
-        raise FileNotFoundError(f"File not found: {path}")
-    with open(path, "r") as f:
-        return f.read().strip()
 
 
 def decide_next_action(client, system_prompt, flow_prompt, focus_label):
@@ -85,10 +79,6 @@ def main():
 
     system_prompt = load_text_file("prompts/system_flow.txt")
     flow_prompt = load_text_file(args.prompt_file)
-
-    print("📜 Loaded system prompt")
-    print("📜 Loaded flow prompt")
-    print("-" * 50)
 
     camera = RealTimeCamera(RTSP_URL)
     camera.start()

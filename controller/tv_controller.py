@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import websocket
 import ssl
 import json
@@ -6,16 +7,19 @@ import os
 import threading
 import time
 
-TV_IP = "192.168.1.38"     # 🔴 CHANGE IF NEEDED
-TV_PORT = 8002
+load_dotenv()
+
+TV_IP = os.getenv("TV_IP")
+TV_PORT = int(os.getenv("TV_PORT"))
 APP_NAME = "PythonRemote"
-TOKEN_FILE = "tv-token.txt"
+TOKEN_FILE = os.getenv("TOKEN_FILE")
 
 
 class SamsungRemote:
     def __init__(self):
         self.token = self._load_token()
         self.ws = None
+        self.authorized = threading.Event() 
 
     def _load_token(self):
         if os.path.exists(TOKEN_FILE):
@@ -51,10 +55,14 @@ class SamsungRemote:
         )
         thread.start()
 
-        time.sleep(2)  # allow handshake
+        print("⏳ Waiting for TV authorization...")
+        if not self.authorized.wait(timeout=10):
+            raise RuntimeError("TV authorization timeout")
+
+        print("✅ TV authorized")
 
     def _on_open(self, ws):
-        print("✅ Connected to Samsung TV")
+        print("🔌 WebSocket connected")
 
     def _on_message(self, ws, message):
         msg = json.loads(message)
@@ -65,10 +73,17 @@ class SamsungRemote:
             self._save_token(self.token)
             print("🔐 Token saved")
 
+        if msg.get("event") == "ms.channel.connect":
+            self.authorized.set()  # ✅ AUTH CONFIRMED
+
     def _on_error(self, ws, error):
         print("❌ WebSocket error:", error)
 
     def send_key(self, key):
+        if not self.authorized.is_set():
+            print(f"⚠️ Ignoring key {key} — not authorized yet")
+            return
+
         payload = {
             "method": "ms.remote.control",
             "params": {
@@ -79,7 +94,11 @@ class SamsungRemote:
             }
         }
 
-        if self.ws:
-            self.ws.send(json.dumps(payload))
-            print("➡️ Sent:", key)
-            time.sleep(0.3)  # debounce
+        self.ws.send(json.dumps(payload))
+        print("➡️ Sent:", key)
+        time.sleep(0.3)
+
+    def execute_actions(self, actions, delay=0.4):
+        for key in actions:
+            self.send_key(key)
+            time.sleep(delay)
