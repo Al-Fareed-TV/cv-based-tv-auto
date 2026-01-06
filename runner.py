@@ -5,8 +5,8 @@ import argparse
 from datetime import datetime
 
 from camera.realtime_camera import RealTimeCamera
-from cv.llm_focus_detector import detect_focus_with_gemini
-from google import genai
+from cv.llm_focus_detector import detect_focus_with_gemini, get_llm_manager
+from cv.llm.manager import LLMManager
 from dotenv import load_dotenv
 from controller.tv_controller import SamsungRemote 
 from utils.logger import log_event
@@ -17,14 +17,14 @@ load_dotenv()
 # ---------------- CONFIG ---------------- #
 
 RTSP_URL = os.getenv("RTSP_URL")
-LLM_INTERVAL_SECONDS = os.getenv("LLM_INTERVAL_SECONDS")
-KEY_PRESS_DELAY = os.getenv("KEY_PRESS_DELAY")  
-POST_ACTION_DELAY = os.getenv("POST_ACTION_DELAY") 
+LLM_INTERVAL_SECONDS = float(os.getenv("LLM_INTERVAL_SECONDS"))
+KEY_PRESS_DELAY = float(os.getenv("KEY_PRESS_DELAY"))
+POST_ACTION_DELAY = float(os.getenv("POST_ACTION_DELAY"))
 
 # --------------------------------------- #
 
 
-def decide_next_action(client, system_prompt, flow_prompt, focus_label):
+def decide_next_action(manager, system_prompt, flow_prompt, focus_label):
     prompt = f"""
 {system_prompt}
 
@@ -35,25 +35,30 @@ Current focused element:
 {focus_label}
 """
 
-    response = client.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=[prompt]
-    )
+    text = manager.generate_text(prompt)
 
-    text = response.text.strip()
-    start = text.find("{")
-    end = text.rfind("}") + 1
-
-    return json.loads(text[start:end])
-
+    try:
+        start = text.find("{")
+        end = text.rfind("}") + 1
+        return json.loads(text[start:end])
+    except Exception as e:
+        print(f"[ERROR] JSON parse failed during navigation decision: {e}. Raw Text: {text}")
+        # Return a safe fallback or re-raise
+        raise
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        description="TV automation runner using camera + Gemini"
+        description="TV automation runner using camera + Multi-LLM Support"
     )
     parser.add_argument(
         "prompt_file",
         help="Path to flow prompt file (e.g. tests/remote_test.txt)"
+    )
+    parser.add_argument(
+        "--provider",
+        choices=["auto", "gemini", "openai"],
+        default="auto",
+        help="LLM Provider to use (auto|gemini|openai). Default: auto (Failover)"
     )
     return parser.parse_args()
 
@@ -70,12 +75,17 @@ def execute_actions(remote, actions):
 
 def main():
     args = parse_args()
+    
+    # 🌍 Set LLM Provider from CLI arg
+    if args.provider:
+        os.environ["LLM_PROVIDER"] = args.provider
+        print(f"🔹 LLM Provider set to: {args.provider}")
 
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY not set")
-
-    client = genai.Client(api_key=api_key)
+    # Initialize Manager (will read env var)
+    # We use get_llm_manager to share the instance with focus detector if possible,
+    # or just create a new one. Since get_llm_manager is available, let's use it
+    # to ensure consistency if it does caching (currently simple singleton).
+    manager = get_llm_manager()
 
     system_prompt = load_text_file("prompts/system_flow.txt")
     flow_prompt = load_text_file(args.prompt_file)
@@ -108,6 +118,7 @@ def main():
 
             # 2️⃣ Vision LLM – focus detection
             log_event(step_id, "Sending frame to Vision LLM for focus detection")
+            # This function internally calls get_llm_manager(), so it uses the same config
             focus_result = detect_focus_with_gemini(frame)
             log_event(step_id, "Received focus detection result")
 
@@ -120,7 +131,7 @@ def main():
             # 3️⃣ Text LLM – navigation decision
             log_event(step_id, "Sending context to Text LLM for navigation decision")
             decision = decide_next_action(
-                client,
+                manager,
                 system_prompt,
                 flow_prompt,
                 focus_label

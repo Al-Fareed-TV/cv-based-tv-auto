@@ -1,12 +1,20 @@
 import time
-import os
 import json
 import tempfile
 from PIL import Image
-from google import genai
 from dotenv import load_dotenv
+from cv.llm.manager import LLMManager
 
 load_dotenv()
+
+# Initialize the manager once (or lazily)
+_llm_manager = None
+
+def get_llm_manager():
+    global _llm_manager
+    if _llm_manager is None:
+        _llm_manager = LLMManager()
+    return _llm_manager
 
 
 def get_focused_element_prompt():
@@ -50,56 +58,43 @@ Respond ONLY in valid JSON:
 
 
 def detect_focus_with_gemini(frame):
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY not set")
+    """
+    Detects the focused element using the configured LLM provider(s).
+    Renamed internally to use Manager, but kept function name for compatibility if needed.
+    (Though better to rename to detect_focus in future, keeping compat for now).
+    """
+    manager = get_llm_manager()
 
-    client = genai.Client(api_key=api_key)
-
-    # Save frame temporarily
-    with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
-        Image.fromarray(frame).save(tmp.name)
-        image = Image.open(tmp.name)
+    # Convert numpy frame (from opencv) to PIL Image
+    image = Image.fromarray(frame)
 
     prompt = get_focused_element_prompt()
 
-    response = client.models.generate_content(
-        model=os.getenv("LLM_MODEL"), contents=[prompt, image]
-    )
+    text = manager.generate_content(prompt, image)
 
-    text = response.text.strip()
-    start = text.find("{")
-    end = text.rfind("}") + 1
-
-    return json.loads(text[start:end])
-
-def assert_screen_with_llm(frame, expected_content, retries=3, delay=1.0):
-    api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
-        raise RuntimeError("GEMINI_API_KEY not set")
-
-    client = genai.Client(api_key=api_key)
-
-    for attempt in range(1, retries + 1):
-        # Save frame temporarily
-        with tempfile.NamedTemporaryFile(suffix=".jpg", delete=False) as tmp:
-            Image.fromarray(frame).save(tmp.name)
-            image = Image.open(tmp.name)
-
-        prompt = get_assertion_prompt(expected_content)
-
-        response = client.models.generate_content(
-            model=os.getenv("LLM_MODEL"),
-            contents=[prompt, image]
-        )
-
-        text = response.text.strip()
+    try:
         start = text.find("{")
         end = text.rfind("}") + 1
+        return json.loads(text[start:end])
+    except Exception as e:
+        print(f"[ERROR] JSON parse failed: {e}. Raw Text: {text}")
+        raise
+
+def assert_screen_with_llm(frame, expected_content, retries=3, delay=1.0):
+    manager = get_llm_manager()
+
+    for attempt in range(1, retries + 1):
+        image = Image.fromarray(frame)
+        prompt = get_assertion_prompt(expected_content)
 
         try:
+            text = manager.generate_content(prompt, image)
+            
+            start = text.find("{")
+            end = text.rfind("}") + 1
             result = json.loads(text[start:end])
-        except Exception:
+        except Exception as e:
+            print(f"[WARN] Assertion attempt {attempt} failed: {e}")
             result = {"match": False, "confidence": 0.0}
 
         match = result.get("match", False)
