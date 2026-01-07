@@ -98,7 +98,7 @@
 
 "Search":
   Search Input:
-    keys: [KEY_ENTER, KEY_UP]
+    keys: [KEY_UP]
 
 "Recently Viewed":
   Search Input:

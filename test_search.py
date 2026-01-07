@@ -1,11 +1,10 @@
+from time import time
 import os
 from core.context import DriverContext
 from dotenv import load_dotenv
 import time
 
-
 load_dotenv()
-# ---------------- CONFIG ---------------- #
 
 RTSP_URL = os.getenv("RTSP_URL")
 
@@ -13,14 +12,30 @@ def test_search():
     ctx = DriverContext(RTSP_URL)
     ctx.start()
     try:
-        ctx.press("Home")
-        ctx.goto("For You","App Settings")
+        # ctx.goto("For You","App Settings")
+        # ctx.press("ENTER")
+        # time.sleep(5)
+        # isExpectedScreenDisplayed =  ctx.assert_screen("Am I in Settings(DEVELOPE MODE) page?")
+        # print("Is user viewing app screen",isExpectedScreenDisplayed)
+        # ctx.goto("App Settings","Sony LIV Delete")
+        # ctx.press("ENTER")
+
+        # ctx.press("HOME")
+        # ctx.press("HOME")
+        # isUserOnHomeScreen = ctx.assert_screen("Am I in ```For You``` tab?")
+        # print("Is user on Home Screen",isUserOnHomeScreen)
+        ctx.goto("For You","Search")
         ctx.press("ENTER")
         time.sleep(5)
-        isExpectedScreenDisplayed =  ctx.assert_screen("Am I in Settings(DEVELOPE MODE) page?")
-        print("Is user viewing app screen",isExpectedScreenDisplayed)
-        ctx.goto("App Settings","Sony LIV Delete")
+        ctx.goto("Search","Search Input")
         ctx.press("ENTER")
+        isExpectedScreenDisplayed =  ctx.assert_screen("Is Virtual Keyboard Visible?")
+        print("Is virtual keyboard visible",isExpectedScreenDisplayed)
+        ctx.type("sony")
+        ctx.type("key_space",start_char="y",delay=0.3)
+        ctx.type("liv",start_char="key_space",delay=0.3)
+        ctx.type("key_search",start_char="v",delay=0.3)
+       
     finally:
         ctx.shutdown()
         
