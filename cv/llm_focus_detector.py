@@ -111,3 +111,14 @@ def assert_screen_with_llm(frame, expected_content, retries=3, delay=1.0):
         time.sleep(delay)
 
     return False
+def detect_focus(frame):
+    manager = get_llm_manager()
+
+    image = Image.fromarray(frame)
+    prompt = get_focused_element_prompt()
+
+    text = manager.generate_content(prompt, image)
+
+    start = text.find("{")
+    end = text.rfind("}") + 1
+    return json.loads(text[start:end])

@@ -36,6 +36,22 @@
         KEY_DOWN,
         KEY_DOWN,
       ]
+  App Settings:
+    keys:
+      [
+        KEY_RIGHT,
+        KEY_RIGHT,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+      ]
 
 "Live":
   For You:
@@ -123,6 +139,7 @@
 
 "Settings":
   Profile:
+    keys: [KEY_UP, KEY_UP, KEY_UP, KEY_UP]
     keys: [KEY_UP, KEY_UP, KEY_UP, KEY_UP]
 
   Search:
