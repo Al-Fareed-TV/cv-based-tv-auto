@@ -1,11 +1,14 @@
 import time
+from actions.virtual_keyboard import generate_actions_for_input
 from camera.realtime_camera import RealTimeCamera
 from controller.tv_controller import SamsungRemote
 from actions.navigator import Navigator
 
-from cv.llm_focus_detector import assert_screen_with_llm,detect_focus
+from cv.llm_focus_detector import assert_screen_with_llm, detect_focus
 
 from utils.logger import log_event
+
+
 class DriverContext:
     def __init__(self, rtsp_url, camera_enabled=True):
         self.step = 0
@@ -19,6 +22,12 @@ class DriverContext:
         self.remote.connect()
         if self.camera:
             self.camera.start()
+
+    def shortWait(self,delay=2):
+        time.sleep(delay)
+
+    def longWait(self,delay=5):
+        time.sleep(delay)
 
     def shutdown(self):
         if self.camera:
@@ -41,6 +50,7 @@ class DriverContext:
             time.sleep(0.05)
 
     def get_focus(self):
+        self.shortWait()
         frame = self.get_frame()
 
         self.step += 1
@@ -50,27 +60,24 @@ class DriverContext:
         return result["focused_element"]["label"]
 
     def assert_screen(
-    self,
-    expected: str,
-    retries = 3,
-    delay = 2.0,
-    min_confidence = 0.6,
+        self,
+        expected: str,
+        retries=3,
+        delay=2.5,
+        min_confidence=0.6,
     ) -> bool:
         for attempt in range(1, retries + 1):
             frame = self.get_frame()
 
             self.step += 1
-            log_event(
-                self.step,
-                f"ASSERT [{expected}] (attempt {attempt}/{retries})"
-            )
+            log_event(self.step, f"ASSERT [{expected}] (attempt {attempt}/{retries})")
 
             try:
                 result = assert_screen_with_llm(
                     frame,
                     expected,
-                    retries=1,      # IMPORTANT: disable internal retries
-                    delay=0.0
+                    retries=1,
+                    delay=2.5,
                 )
             except Exception as e:
                 log_event(self.step, f"LLM assertion error: {e}")
@@ -86,13 +93,13 @@ class DriverContext:
         log_event(self.step, f"ASSERT FAILED after {retries} attempts")
         return False
 
-    def goto(self, destination):
-        current_focus = self.get_focus()
+    def goto(self, current_focus, destination):
         log_event(self.step, f"GOTO from [{current_focus}] to [{destination}]")
         self.navigator.goto(current_focus, destination)
 
     def press(self, key):
         log_event(self.step, f"PRESS {key}")
+        self.shortWait()
         self.remote.send_key(f"KEY_{key}")
 
     def long_press(self, key, duration=3, interval=0.0):
@@ -105,7 +112,11 @@ class DriverContext:
             self.remote.send_key(remote_key)
             time.sleep(interval)
 
-
-    def type(self, text):
+    def type(self, text, start_char="a", delay=0.5):
         log_event(self.step, f"TYPE '{text}'")
-        raise NotImplementedError("Virtual keyboard typing not implemented yet")
+
+        actions = generate_actions_for_input(text, start_char)
+
+        for key in actions:
+            self.remote.send_key(key)
+        time.sleep(delay)

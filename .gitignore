@@ -1,4 +1,5 @@
 *.env
 *venv
 tv-token.txt
+logs/
 *__pycache__

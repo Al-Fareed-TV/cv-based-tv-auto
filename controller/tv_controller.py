@@ -65,16 +65,25 @@ class SamsungRemote:
         print("🔌 WebSocket connected")
 
     def _on_message(self, ws, message):
-        msg = json.loads(message)
-        print("📩 TV:", msg)
+        try:
+            msg = json.loads(message)
+        except Exception:
+            print("⚠️ Non-JSON message:", message)
+            return
 
-        if msg.get("data", {}).get("token"):
-            self.token = msg["data"]["token"]
+        event = msg.get("event")
+        data = msg.get("data")
+
+        if isinstance(data, dict) and "token" in data:
+            self.token = data["token"]
             self._save_token(self.token)
             print("🔐 Token saved")
 
-        if msg.get("event") == "ms.channel.connect":
-            self.authorized.set()  # ✅ AUTH CONFIRMED
+        if event == "ms.channel.connect":
+            self.authorized.set()
+
+        if event and event.startswith("ms.remote.ime"):
+            return
 
     def _on_error(self, ws, error):
         print("❌ WebSocket error:", error)
