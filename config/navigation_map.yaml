@@ -35,6 +35,21 @@
         KEY_DOWN,
         KEY_DOWN,
       ]
+  App Settings:
+    keys:
+      [
+        KEY_RIGHT,
+        KEY_RIGHT,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+      ]
 
 "Live":
   For You:
@@ -59,9 +74,6 @@
   For You:
     keys: [KEY_LEFT, KEY_LEFT]
 
-  Apps:
-    keys: []
-
   Live:
     keys: [KEY_LEFT]
 
@@ -76,6 +88,21 @@
 
   Settings:
     keys: [KEY_LEFT, KEY_LEFT, KEY_LEFT, KEY_DOWN, KEY_DOWN]
+
+  App Settings:
+    keys:
+      [
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+        KEY_DOWN,
+      ] 
 
 "Home":
   Search:
@@ -96,9 +123,17 @@
   Search Input:
     keys: [KEY_UP, KEY_ENTER, KEY_UP]
 
-"Search":
+"Search Screen":
   Search Input:
     keys: [KEY_UP]
+
+"Search Input":
+  Sony LIV App:
+    keys: [KEY_DOWN, KEY_DOWN]
+
+"Sony LIV App Installation Screen":
+  Install:
+    keys: [KEY_DOWN]
 
 "Recently Viewed":
   Search Input:
@@ -110,6 +145,7 @@
 
 "Settings":
   Profile:
+    keys: [KEY_UP, KEY_UP, KEY_UP, KEY_UP]
     keys: [KEY_UP, KEY_UP, KEY_UP, KEY_UP]
 
   Search:
@@ -134,3 +170,21 @@
   
   Sony LIV Lock:
     keys: [KEY_DOWN, KEY_DOWN, KEY_DOWN]
+  
+"Delete":
+  Delete:
+    keys: [KEY_LEFT]
+
+"Sony LIV Home":
+  Sony LIV Search:
+    keys: [KEY_DOWN, KEY_LEFT]
+  Movies:
+    keys: [KEY_DOWN, KEY_DOWN, KEY_DOWN, KEY_DOWN, KEY_DOWN, KEY_DOWN]
+
+"Sony LIV Search":
+  Search Banner:
+    keys: [KEY_RIGHT]
+
+"Search":
+  Search Input:
+    keys: [KEY_UP]
