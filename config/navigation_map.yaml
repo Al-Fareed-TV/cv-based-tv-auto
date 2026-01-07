@@ -34,7 +34,6 @@
         KEY_DOWN,
         KEY_DOWN,
         KEY_DOWN,
-        KEY_DOWN,
       ]
 
 "Live":
@@ -59,6 +58,9 @@
 "Apps":
   For You:
     keys: [KEY_LEFT, KEY_LEFT]
+
+  Apps:
+    keys: []
 
   Live:
     keys: [KEY_LEFT]

@@ -119,37 +119,71 @@ Navigation rules on Search screen:
 - KEY_DOWN moves back to Recently Viewed tiles.
 
 --------------------------------------------------
+SETTINGS (DEVELOP MODE) SCREEN
+--------------------------------------------------
+
+Screen title:
+- "Settings (DEVELOP MODE)" (top-left, NOT focusable)
+
+Top-right info area (NOT focusable):
+- Storage usage indicator
+  - "Used: <value>GB"
+  - "Available: <value>GB (<percentage>)"
+- Auto update toggle
+  - Label: "Auto update : ON" or "Auto update : OFF"
+  - Toggle state is visually indicated
+  - Toggle is NOT focusable from this screen
+
+--------------------------------------------------
+SETTINGS SCREEN CONTENT
+--------------------------------------------------
+
+Main content:
+- A horizontal row of application tiles
+
+Visible app tiles may include (left to right):
+- Sony LIV
+- Gallery
+- Spotify
+- Internet
+- Bixby
+- YouTube
+
+Behavior:
+- Tiles are navigated using KEY_LEFT and KEY_RIGHT
+- Exactly ONE app tile is focused at any time
+- Focused tile appears visually highlighted
+
+--------------------------------------------------
+APP TILE CONTEXT MENU
+--------------------------------------------------
+
+When an app tile is focused:
+- A context menu appears near the focused tile
+
+Context menu items (top to bottom):
+1. Add to Home
+2. Delete
+3. Lock
+
+Behavior:
+- Context menu items are vertically navigable
+- KEY_UP / KEY_DOWN move within context menu
+- KEY_ENTER selects the focused context menu action
+- KEY_LEFT or KEY_RIGHT returns focus to app tiles
+
+--------------------------------------------------
 NAVIGATION RULES
 --------------------------------------------------
 
-- KEY_LEFT / KEY_RIGHT move focus horizontally.
-- KEY_UP / KEY_DOWN move focus vertically.
-- Focus does NOT wrap unless visually supported.
-- Ignore reflections, background objects, and non-TV elements.
-
---------------------------------------------------
-DECISION RULES
---------------------------------------------------
-
-You will be provided with:
-1. A navigation goal
-2. The current focused element
-
-Your task:
-- Decide ONLY the NEXT navigation action(s).
-- Return a sequence ONLY if actions must be executed in order.
-- If the goal is achieved, return NONE.
-- Do NOT explain.
-- Do NOT add extra text.
-- If you don't get current screen, then go to "HOME"
---------------------------------------------------
-RESPONSE FORMAT (STRICT)
---------------------------------------------------
-
-Respond ONLY in valid JSON:
-
-{
-  "current_focus": "<string describing focused element>",
-  "next_action": ["KEY_UP","KEY_ENTER"] | "NONE",
-  "confidence": 0.0-1.0
-}
+- KEY_LEFT / KEY_RIGHT:
+  - Move focus between app tiles
+- KEY_UP:
+  - No effect unless context menu is open
+- KEY_DOWN:
+  - No effect unless context menu is open
+- KEY_ENTER:
+  - On app tile → opens context menu
+  - On context menu item → executes action
+- KEY_HOME:
+  - Returns to Home screen

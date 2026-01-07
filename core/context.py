@@ -86,8 +86,7 @@ class DriverContext:
         log_event(self.step, f"ASSERT FAILED after {retries} attempts")
         return False
 
-    def goto(self, destination):
-        current_focus = self.get_focus()
+    def goto(self,current_focus, destination):
         log_event(self.step, f"GOTO from [{current_focus}] to [{destination}]")
         self.navigator.goto(current_focus, destination)
 
