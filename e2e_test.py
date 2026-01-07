@@ -13,7 +13,7 @@ def end_to_end_test():
     try:
         ctx.goto("For You","App Settings")
         ctx.press("ENTER")
-        time.sleep(5)
+        ctx.longWait()
         isExpectedScreenDisplayed =  ctx.assert_screen("Am I in Settings(DEVELOPE MODE) page?")
         print("Is user viewing app screen",isExpectedScreenDisplayed)
         ctx.goto("App Settings","Sony LIV Delete")
@@ -26,7 +26,7 @@ def end_to_end_test():
         print("Is user on Home Screen",isUserOnHomeScreen)
         ctx.goto("For You","Search")
         ctx.press("ENTER")
-        time.sleep(5)
+        ctx.longWait()
         isExpectedScreenDisplayed = ctx.assert_screen("Am I in Search screen?")
         print("Is user viewing search screen",isExpectedScreenDisplayed)
 
@@ -38,6 +38,10 @@ def end_to_end_test():
         ctx.type("key_space",start_char="y",delay=0.3)
         ctx.type("liv",start_char="key_space",delay=0.3)
         ctx.type("key_search",start_char="v",delay=0.3)
+        ctx.press("ENTER")
+        ctx.press("ENTER")
+        ctx.longWait(7)
+        ctx.press("ENTER")
        
     finally:
         ctx.shutdown()

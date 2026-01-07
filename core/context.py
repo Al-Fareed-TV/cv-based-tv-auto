@@ -8,6 +8,7 @@ from cv.llm_focus_detector import assert_screen_with_llm, detect_focus
 
 from utils.logger import log_event
 
+
 class DriverContext:
     def __init__(self, rtsp_url, camera_enabled=True):
         self.step = 0
@@ -21,6 +22,12 @@ class DriverContext:
         self.remote.connect()
         if self.camera:
             self.camera.start()
+
+    def shortWait(self,delay=2):
+        time.sleep(delay)
+
+    def longWait(self,delay=5):
+        time.sleep(delay)
 
     def shutdown(self):
         if self.camera:
@@ -43,6 +50,7 @@ class DriverContext:
             time.sleep(0.05)
 
     def get_focus(self):
+        self.shortWait()
         frame = self.get_frame()
 
         self.step += 1
@@ -68,7 +76,7 @@ class DriverContext:
                 result = assert_screen_with_llm(
                     frame,
                     expected,
-                    retries=1,  # IMPORTANT: disable internal retries
+                    retries=1,
                     delay=2.5,
                 )
             except Exception as e:
@@ -91,6 +99,7 @@ class DriverContext:
 
     def press(self, key):
         log_event(self.step, f"PRESS {key}")
+        self.shortWait()
         self.remote.send_key(f"KEY_{key}")
 
     def long_press(self, key, duration=3, interval=0.0):
@@ -103,7 +112,7 @@ class DriverContext:
             self.remote.send_key(remote_key)
             time.sleep(interval)
 
-    def type(self, text, start_char="a", delay=0.3):
+    def type(self, text, start_char="a", delay=0.5):
         log_event(self.step, f"TYPE '{text}'")
 
         actions = generate_actions_for_input(text, start_char)
