@@ -57,12 +57,8 @@ class LLMManager:
                 error_msg = str(e).lower()
                 errors.append(f"{type(provider).__name__}: {str(e)}")
                 
-                # Check if we should failover
                 is_last_provider = (i == len(self.providers) - 1)
                 
-                # User requirement: "if it gives the limit exceed message then trying with open API"
-                # We interpret this as: if we have backup providers, use them on failure.
-                # We specifically look for rate limit indicators in the message, but generally failing over is safe.
                 limit_keywords = ["limit", "quota", "429", "exhausted", "resource"]
                 is_limit_error = any(k in error_msg for k in limit_keywords)
                 

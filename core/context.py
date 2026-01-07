@@ -3,7 +3,7 @@ from camera.realtime_camera import RealTimeCamera
 from controller.tv_controller import SamsungRemote
 from actions.navigator import Navigator
 
-from cv.llm_focus_detector import assert_screen_with_llm, detect_focus_with_gemini,detect_focus
+from cv.llm_focus_detector import assert_screen_with_llm,detect_focus
 
 from utils.logger import log_event
 class DriverContext:
