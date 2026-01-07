@@ -2,7 +2,9 @@ import time
 from camera.realtime_camera import RealTimeCamera
 from controller.tv_controller import SamsungRemote
 from actions.navigator import Navigator
-from cv.llm_focus_detector import assert_screen_with_llm, detect_focus_with_gemini
+
+from cv.llm_focus_detector import assert_screen_with_llm, detect_focus_with_gemini,detect_focus
+
 from utils.logger import log_event
 class DriverContext:
     def __init__(self, rtsp_url, camera_enabled=True):
@@ -44,24 +46,44 @@ class DriverContext:
         self.step += 1
         log_event(self.step, "Sending frame to LLM for focus detection")
 
-        result = detect_focus_with_gemini(frame)
+        result = detect_focus(frame)
         return result["focused_element"]["label"]
 
-    def assert_screen(self, expected, retries=3, delay=1.0):
+    def assert_screen(
+    self,
+    expected: str,
+    retries = 3,
+    delay = 2.0,
+    min_confidence = 0.6,
+    ) -> bool:
         for attempt in range(1, retries + 1):
             frame = self.get_frame()
 
             self.step += 1
             log_event(
                 self.step,
-                f"Asserting screen [{expected}] (attempt {attempt}/{retries})",
+                f"ASSERT [{expected}] (attempt {attempt}/{retries})"
             )
 
-            if assert_screen_with_llm(frame, expected):
+            try:
+                result = assert_screen_with_llm(
+                    frame,
+                    expected,
+                    retries=1,      # IMPORTANT: disable internal retries
+                    delay=0.0
+                )
+            except Exception as e:
+                log_event(self.step, f"LLM assertion error: {e}")
+                result = False
+
+            if result:
+                log_event(self.step, "ASSERT PASSED")
                 return True
 
+            log_event(self.step, "ASSERT FAILED — retrying")
             time.sleep(delay)
 
+        log_event(self.step, f"ASSERT FAILED after {retries} attempts")
         return False
 
     def goto(self, destination):

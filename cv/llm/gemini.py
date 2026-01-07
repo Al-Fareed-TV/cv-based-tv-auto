@@ -10,7 +10,7 @@ class GeminiProvider(LLMProvider):
         if not self.api_key:
             raise RuntimeError("GEMINI_API_KEY not set")
         
-        self.model = model or os.getenv("LLM_MODEL", "gemini-1.5-flash")
+        self.model = model or os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
         self.client = genai.Client(api_key=self.api_key)
 
     def generate_content(self, prompt: str, image: Image.Image) -> str:

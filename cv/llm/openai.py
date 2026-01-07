@@ -16,7 +16,7 @@ class OpenAIProvider(LLMProvider):
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         # OpenAI provider is optional, so we don't strict raise if not present unless used
         
-        self.model = model or os.getenv("LLM_MODEL", "gpt-4o")
+        self.model = model or os.getenv("OPENAI_MODEL", "gpt-4o")
         if self.api_key:
             self.client = OpenAI(api_key=self.api_key)
         else:
