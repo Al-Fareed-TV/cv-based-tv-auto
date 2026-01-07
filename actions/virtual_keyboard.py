@@ -32,10 +32,10 @@ class KeyboardLayout:
         ".": (3, 6),
         "caps": (3, 7),
         "key_settings": (4, 0),
-        "key_space": (4, 2),
-        "key_search": (4, 4),
-        "key_left": (4, 6),
-        "key_right": (4, 7),
+        "key_space": (4, 1),
+        "key_search": (4, 2),
+        "key_left": (4, 3),
+        "key_right": (4, 4),
     }
 
 
@@ -47,14 +47,8 @@ class KeyboardNavigator:
 
         self.row, self.col = KeyboardLayout.KEYS[start_char]
 
-    def move_to(self, key):
-        key = key.lower()
-        if key not in KeyboardLayout.KEYS:
-            raise ValueError(f"Key not found on keyboard: {key}")
-
-        target_row, target_col = KeyboardLayout.KEYS[key]
+    def _calculate_moves(self, target_row, target_col):
         actions = []
-
         # Vertical moves
         while self.row < target_row:
             actions.append("KEY_DOWN")
@@ -70,6 +64,28 @@ class KeyboardNavigator:
         while self.col > target_col:
             actions.append("KEY_LEFT")
             self.col -= 1
+        return actions
+
+    def move_to(self, key):
+        key = key.lower()
+        if key not in KeyboardLayout.KEYS:
+            raise ValueError(f"Key not found on keyboard: {key}")
+
+        target_row, target_col = KeyboardLayout.KEYS[key]
+        actions = []
+
+        special_keys = ["key_search", "key_settings", "key_space"]
+        
+        # If target is a special key, route through 'v'
+        if key in special_keys:
+            v_row, v_col = KeyboardLayout.KEYS["v"]
+            # Move to 'v' first
+            actions.extend(self._calculate_moves(v_row, v_col))
+            # Then move to target
+            actions.extend(self._calculate_moves(target_row, target_col))
+        else:
+            # Direct movement
+            actions.extend(self._calculate_moves(target_row, target_col))
 
         actions.append("KEY_ENTER")
         return actions
