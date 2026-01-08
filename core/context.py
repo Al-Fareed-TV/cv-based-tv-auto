@@ -23,10 +23,10 @@ class DriverContext:
         if self.camera:
             self.camera.start()
 
-    def shortWait(self,delay=2):
+    def shortWait(self, delay=2):
         time.sleep(delay)
 
-    def longWait(self,delay=5):
+    def longWait(self, delay=5):
         time.sleep(delay)
 
     def shutdown(self):
@@ -61,24 +61,29 @@ class DriverContext:
 
     def assert_screen(
         self,
-        expected: str,
-        retries=3,
-        delay=2.5,
-        min_confidence=0.6,
+        screen_name: str,
+        screen_spec: dict,
+        retries: int = 3,
+        delay: float = 2.5,
+        min_confidence: float = 0.6,
     ) -> bool:
         for attempt in range(1, retries + 1):
+            self.shortWait(3)
             frame = self.get_frame()
 
             self.step += 1
-            log_event(self.step, f"ASSERT [{expected}] (attempt {attempt}/{retries})")
-
+            log_event(
+                self.step, f"ASSERT [{screen_name}] (attempt {attempt}/{retries})"
+            )
             try:
                 result = assert_screen_with_llm(
-                    frame,
-                    expected,
-                    retries=1,
-                    delay=2.5,
+                    frame=frame,
+                    screen_name=screen_name,
+                    screen_spec=screen_spec,
+                    retries=1,  
+                    delay=0.0,
                 )
+
             except Exception as e:
                 log_event(self.step, f"LLM assertion error: {e}")
                 result = False

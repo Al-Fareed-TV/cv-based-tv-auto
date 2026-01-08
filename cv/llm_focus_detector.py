@@ -10,6 +10,7 @@ load_dotenv()
 # Initialize the manager once (or lazily)
 _llm_manager = None
 
+
 def get_llm_manager():
     global _llm_manager
     if _llm_manager is None:
@@ -34,26 +35,41 @@ Return ONLY valid JSON:
 }
 """
 
-def get_assertion_prompt(expected_content):
+
+def get_assertion_prompt(screen_name: str, screen_spec: dict) -> str:
     return f"""
-You are validating a Smart TV screen.
+You are a STRICT screen validator for a Smart TV UI.
 
-Task:
-Determine whether the CURRENT screen contains the following expected content:
+You are shown ONE image of the TV screen.
 
-Expected content:
-"{expected_content}"
+Your task:
+Verify whether the image MATCHES the expected screen described below.
 
-Rules:
-- Focus ONLY on the TV UI.
-- Ignore reflections, room background, or camera artifacts.
-- Answer strictly based on visible UI text, icons, or sections.
+Screen name:
+{screen_name}
 
-Respond ONLY in valid JSON:
+Expected screen specification (ground truth):
+{json.dumps(screen_spec, indent=2)}
+
+Rules (MANDATORY):
+- Use ONLY what is VISIBLE on the TV UI.
+- Ignore reflections, room objects, glare, and camera artifacts.
+- DO NOT assume or guess missing elements.
+- If 50% of required visible element is missing → match = false.
+- If 10% or 1 or 2 required visible element is missing → match = True.
+- If the screen is ambiguous or unclear → match = false.
+- NEVER infer navigation state.
+- NEVER explain your reasoning.
+
+Response format (STRICT JSON ONLY):
 {{
   "match": true | false,
-  "confidence": 0.0-1.0
+  "confidence": number   // 0.0 to 1.0
 }}
+
+IMPORTANT:
+- Output MUST be valid JSON.
+- Do NOT include any text outside JSON.
 """
 
 
@@ -80,37 +96,49 @@ def detect_focus_with_gemini(frame):
         print(f"[ERROR] JSON parse failed: {e}. Raw Text: {text}")
         raise
 
-def assert_screen_with_llm(frame, expected_content, retries=3, delay=1.0):
+
+def assert_screen_with_llm(
+    frame,
+    screen_name: str,
+    screen_spec: dict,
+    retries: int = 3,
+    delay: float = 1.0,
+    min_confidence: float = 0.6,
+) -> bool:
     manager = get_llm_manager()
 
     for attempt in range(1, retries + 1):
         image = Image.fromarray(frame)
-        prompt = get_assertion_prompt(expected_content)
+        prompt = get_assertion_prompt(screen_name, screen_spec)
 
         try:
             text = manager.generate_content(prompt, image)
-            
+
             start = text.find("{")
             end = text.rfind("}") + 1
             result = json.loads(text[start:end])
+
+            match = bool(result.get("match", False))
+            confidence = float(result.get("confidence", 0.0))
+
         except Exception as e:
             print(f"[WARN] Assertion attempt {attempt} failed: {e}")
-            result = {"match": False, "confidence": 0.0}
-
-        match = result.get("match", False)
-        confidence = result.get("confidence", 0.0)
+            match = False
+            confidence = 0.0
 
         print(
-            f"[ASSERT] Attempt {attempt}/{retries} | "
+            f"[ASSERT] {screen_name} | "
+            f"attempt {attempt}/{retries} | "
             f"match={match} confidence={confidence}"
         )
 
-        if match:
+        if match and confidence >= min_confidence:
             return True
 
         time.sleep(delay)
 
     return False
+
 def detect_focus(frame):
     manager = get_llm_manager()
 
