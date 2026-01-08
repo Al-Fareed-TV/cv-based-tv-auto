@@ -1,6 +1,5 @@
 import time
 import json
-import tempfile
 from PIL import Image
 from dotenv import load_dotenv
 from cv.llm.manager import LLMManager

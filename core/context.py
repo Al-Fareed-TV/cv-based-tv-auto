@@ -1,3 +1,4 @@
+from utils.logger import save_failed_assertion_frame
 import time
 from actions.virtual_keyboard import generate_actions_for_input
 from camera.realtime_camera import RealTimeCamera
@@ -60,12 +61,12 @@ class DriverContext:
         return result["focused_element"]["label"]
 
     def assert_screen(
-        self,
-        screen_name: str,
-        screen_spec: dict,
-        retries: int = 3,
-        delay: float = 2.5,
-        min_confidence: float = 0.6,
+    self,
+    screen_name: str,
+    screen_spec: dict,
+    retries: int = 3,
+    delay: float = 2.5,
+    min_confidence: float = 0.6,
     ) -> bool:
         for attempt in range(1, retries + 1):
             self.shortWait(3)
@@ -73,17 +74,18 @@ class DriverContext:
 
             self.step += 1
             log_event(
-                self.step, f"ASSERT [{screen_name}] (attempt {attempt}/{retries})"
+                self.step,
+                f"ASSERT [{screen_name}] (attempt {attempt}/{retries})"
             )
+
             try:
                 result = assert_screen_with_llm(
                     frame=frame,
                     screen_name=screen_name,
                     screen_spec=screen_spec,
-                    retries=1,  
+                    retries=1,
                     delay=0.0,
                 )
-
             except Exception as e:
                 log_event(self.step, f"LLM assertion error: {e}")
                 result = False
@@ -95,7 +97,17 @@ class DriverContext:
             log_event(self.step, "ASSERT FAILED — retrying")
             time.sleep(delay)
 
-        log_event(self.step, f"ASSERT FAILED after {retries} attempts")
+        path = save_failed_assertion_frame(
+            frame=frame,
+            screen_name=screen_name,
+            step_id=self.step
+        )
+
+        log_event(
+            self.step,
+            f"ASSERT FAILED after {retries} attempts — frame saved: {path}"
+        )
+
         return False
 
     def goto(self, current_focus, destination):
