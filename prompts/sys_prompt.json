@@ -1,0 +1,165 @@
+{
+  "home": {
+    "layout": {
+      "left": "side_menu",
+      "center_top": "headings",
+      "below_headings": "tabs",
+      "below_tabs": "content_tiles"
+    },
+    "visible_contents": {
+      "texts": [
+        "Explore your favourite content quickly and easily",
+        "Everything you want is here - enjoy a range of apps and content with Smart Hub."
+      ],
+      "tabs": ["For You", "Live", "Apps"],
+      "tiles": ["Recent content", "Recommended content"]
+    },
+    "headings": {
+      "focusable": false
+    },
+    "tabs": {
+      "focusable": true,
+      "orientation": "horizontal",
+      "items": ["For You", "Live", "Apps"],
+      "focus_style": "white_rounded_background"
+    },
+    "navigation": {
+      "open_side_menu": "KEY_LEFT",
+      "return_to_tabs": "KEY_UP"
+    }
+  },
+
+  "side_menu": {
+    "type": "vertical_menu",
+    "visible_contents": {
+      "menu_items": [
+        "User Profile",
+        "Search",
+        "Home",
+        "Connected Devices",
+        "Settings",
+        "Privacy Choices"
+      ]
+    },
+    "open_behavior": {
+      "trigger": "KEY_LEFT",
+      "initial_focus": "Home"
+    },
+    "navigation": {
+      "up": "KEY_UP",
+      "down": "KEY_DOWN",
+      "exit": "KEY_RIGHT",
+      "select": "KEY_ENTER"
+    }
+  },
+
+  "for_you": {
+    "parent": "home",
+    "visible_contents": {
+      "sections": ["Recent", "TV Plus Recommendation"],
+      "tiles": ["Recently watched items", "Recommended shows"]
+    },
+    "navigation": {
+      "tiles": ["KEY_LEFT", "KEY_RIGHT"],
+      "to_tabs": "KEY_UP"
+    }
+  },
+
+  "live": {
+    "parent": "home",
+    "visible_contents": {
+      "sections": ["On Now", "Live Sports"],
+      "tiles": ["Live TV channels", "Sports events"]
+    },
+    "navigation": {
+      "tiles": ["KEY_LEFT", "KEY_RIGHT"],
+      "to_tabs": "KEY_UP"
+    }
+  },
+
+  "apps": {
+    "parent": "home",
+    "visible_contents": {
+      "sections": ["Editor's Choice", "Downloaded App"],
+      "tiles": ["Installed applications", "Recommended apps"]
+    },
+    "navigation": {
+      "tiles": ["KEY_LEFT", "KEY_RIGHT"],
+      "to_tabs": "KEY_UP"
+    }
+  },
+
+  "search": {
+    "visible_contents": {
+      "search_bar": true,
+      "recently_viewed": ["Previously searched items", "Recent apps"]
+    },
+    "initial_focus": "Recently Viewed",
+    "components": {
+      "search_input": {
+        "position": "above_recently_viewed",
+        "focusable": true,
+        "open_keyboard": "KEY_ENTER"
+      },
+      "recently_viewed": {
+        "focusable": true,
+        "navigation": {
+          "up": "KEY_UP",
+          "down": "KEY_DOWN"
+        }
+      }
+    }
+  },
+
+  "virtual_keyboard": {
+    "type": "ime",
+    "visible_contents": {
+      "keys": ["a-z", "space", "search", "caps", "symbols"],
+      "input_field": true
+    },
+    "focusable": true,
+    "entry_method": "KEY_ENTER",
+    "exit_method": "KEY_BACK"
+  },
+
+  "settings_develop_mode": {
+    "visible_contents": {
+      "title": "Settings (DEVELOP MODE)",
+      "storage_info": ["Used storage", "Available storage"],
+      "auto_update_status": ["Auto update : ON", "Auto update : OFF"],
+      "app_tiles": [
+        "Sony LIV",
+        "Gallery",
+        "Spotify",
+        "Internet",
+        "Bixby",
+        "YouTube"
+      ]
+    },
+    "title": {
+      "focusable": false
+    },
+    "top_right_info": {
+      "focusable": false
+    },
+    "content": {
+      "type": "horizontal_tiles",
+      "navigation": {
+        "left": "KEY_LEFT",
+        "right": "KEY_RIGHT"
+      }
+    }
+  },
+
+  "app_context_menu": {
+    "visible_contents": {
+      "menu_items": ["Add to Home", "Delete", "Lock"]
+    },
+    "trigger": "focus_on_app_tile",
+    "type": "vertical_menu",
+    "navigation": {
+      "up": "KEY_UP",
+      "down": "KEY_DOWN"
+    }
+  }
+}
