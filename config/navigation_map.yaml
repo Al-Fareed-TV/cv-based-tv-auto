@@ -188,3 +188,7 @@
 "Search":
   Search Input:
     keys: [KEY_UP]
+
+"Sony LIV Movies":
+  Movie:
+    keys: [KEY_LEFT, KEY_LEFT, KEY_LEFT, KEY_RIGHT]     
