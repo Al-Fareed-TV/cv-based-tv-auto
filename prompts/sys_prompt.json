@@ -11,8 +11,15 @@
         "Explore your favourite content quickly and easily",
         "Everything you want is here - enjoy a range of apps and content with Smart Hub."
       ],
-      "tabs": ["For You", "Live", "Apps"],
-      "tiles": ["Recent content", "Recommended content"]
+      "tabs": [
+        "For You",
+        "Live",
+        "Apps"
+      ],
+      "tiles": [
+        "Recent content",
+        "Recommended content"
+      ]
     },
     "headings": {
       "focusable": false
@@ -20,7 +27,11 @@
     "tabs": {
       "focusable": true,
       "orientation": "horizontal",
-      "items": ["For You", "Live", "Apps"],
+      "items": [
+        "For You",
+        "Live",
+        "Apps"
+      ],
       "focus_style": "white_rounded_background"
     },
     "navigation": {
@@ -28,7 +39,6 @@
       "return_to_tabs": "KEY_UP"
     }
   },
-
   "side_menu": {
     "type": "vertical_menu",
     "visible_contents": {
@@ -52,47 +62,73 @@
       "select": "KEY_ENTER"
     }
   },
-
   "for_you": {
     "parent": "home",
     "visible_contents": {
-      "sections": ["Recent", "TV Plus Recommendation"],
-      "tiles": ["Recently watched items", "Recommended shows"]
+      "sections": [
+        "Recent",
+        "TV Plus Recommendation"
+      ],
+      "tiles": [
+        "Recently watched items",
+        "Recommended shows"
+      ]
     },
     "navigation": {
-      "tiles": ["KEY_LEFT", "KEY_RIGHT"],
+      "tiles": [
+        "KEY_LEFT",
+        "KEY_RIGHT"
+      ],
       "to_tabs": "KEY_UP"
     }
   },
-
   "live": {
     "parent": "home",
     "visible_contents": {
-      "sections": ["On Now", "Live Sports"],
-      "tiles": ["Live TV channels", "Sports events"]
+      "sections": [
+        "On Now",
+        "Live Sports"
+      ],
+      "tiles": [
+        "Live TV channels",
+        "Sports events"
+      ]
     },
     "navigation": {
-      "tiles": ["KEY_LEFT", "KEY_RIGHT"],
+      "tiles": [
+        "KEY_LEFT",
+        "KEY_RIGHT"
+      ],
       "to_tabs": "KEY_UP"
     }
   },
-
   "apps": {
     "parent": "home",
     "visible_contents": {
-      "sections": ["Editor's Choice", "Downloaded App"],
-      "tiles": ["Installed applications", "Recommended apps"]
+      "sections": [
+        "Editor's Choice",
+        "Downloaded App"
+      ],
+      "tiles": [
+        "Installed applications",
+        "Recommended apps"
+      ]
     },
     "navigation": {
-      "tiles": ["KEY_LEFT", "KEY_RIGHT"],
+      "tiles": [
+        "KEY_LEFT",
+        "KEY_RIGHT"
+      ],
       "to_tabs": "KEY_UP"
     }
   },
-
   "search": {
     "visible_contents": {
       "search_bar": true,
-      "recently_viewed": ["Previously searched items", "Recent apps"]
+      "recently_viewed": [
+        "Previously searched items",
+        "Recent apps"
+      ]
     },
     "initial_focus": "Recently Viewed",
     "components": {
@@ -110,23 +146,33 @@
       }
     }
   },
-
   "virtual_keyboard": {
     "type": "ime",
     "visible_contents": {
-      "keys": ["a-z", "space", "search", "caps", "symbols"],
+      "keys": [
+        "a-z",
+        "space",
+        "search",
+        "caps",
+        "symbols"
+      ],
       "input_field": true
     },
     "focusable": true,
     "entry_method": "KEY_ENTER",
     "exit_method": "KEY_BACK"
   },
-
   "settings_develop_mode": {
     "visible_contents": {
       "title": "Settings (DEVELOP MODE)",
-      "storage_info": ["Used storage", "Available storage"],
-      "auto_update_status": ["Auto update : ON", "Auto update : OFF"],
+      "storage_info": [
+        "Used storage",
+        "Available storage"
+      ],
+      "auto_update_status": [
+        "Auto update : ON",
+        "Auto update : OFF"
+      ],
       "app_tiles": [
         "Sony LIV",
         "Gallery",
@@ -150,16 +196,261 @@
       }
     }
   },
-
   "app_context_menu": {
     "visible_contents": {
-      "menu_items": ["Add to Home", "Delete", "Lock"]
+      "menu_items": [
+        "Add to Home",
+        "Delete",
+        "Lock"
+      ]
     },
     "trigger": "focus_on_app_tile",
     "type": "vertical_menu",
     "navigation": {
       "up": "KEY_UP",
       "down": "KEY_DOWN"
+    }
+  },
+  "sony_liv_home": {
+    "title": "Sony LIV Home Screen",
+    "description": "Sony LIV movies browsing screen with a large hero movie banner and horizontal movie carousel",
+    "screen_type": "content_browse_with_hero",
+    "visible_contents": {
+      "mandatory": [
+        "sony_liv_logo",
+        "subscribe_button",
+        "large_hero_movie_banner",
+        "movie_title_text",
+        "language_and_genre_text",
+        "horizontal_movie_carousel",
+        "focused_movie_tile",
+        "Trending In India Today section"
+      ],
+      "optional": [
+        "age_rating_badge",
+        "streaming_status_text",
+        "play_icon_on_tiles",
+        "carousel_navigation_arrow",
+        "trending_section_label"
+      ]
+    },
+    "hero_section_characteristics": [
+      "occupies majority of right side of screen",
+      "contains a large movie poster or character image",
+      "contains movie title text",
+      "contains language and genre text (e.g. Malayalam, Crime, Thriller)",
+      "background artwork is static and promotional"
+    ],
+    "carousel_characteristics": [
+      "horizontal row of movie thumbnails near bottom",
+      "one thumbnail is visually highlighted with a white border or glow",
+      "each tile may contain a play icon",
+      "LEFT and RIGHT navigate between tiles"
+    ],
+    "focus_rules": {
+      "initial_focus": "one_movie_tile_in_carousel",
+      "navigation_behavior": [
+        "LEFT and RIGHT move between movie tiles",
+        "UP moves focus toward hero/banner area",
+        "DOWN moves focus to next content section"
+      ]
+    },
+    "assertion_rules": [
+      "Movie title text may vary and should NOT be matched exactly",
+      "Hero artwork may change and should NOT be matched by face or actor",
+      "At least ONE movie title text must be visible",
+      "At least ONE horizontal carousel must be visible",
+      "At least ONE focused tile highlight must be visible",
+      "Ignore reflections, camera glare, and room background",
+      "Do NOT confuse this screen with video player or subscription paywall"
+    ],
+    "negative_indicators": [
+      "video playback timeline",
+      "pause or play progress bar",
+      "audio or subtitle settings menu",
+      "full screen video playback"
+    ],
+    "confidence_guidelines": {
+      "high": "Hero banner, movie title text, and focused carousel tile are all clearly visible",
+      "medium": "Hero banner and carousel visible but text partially blurred",
+      "low": "Only video playback controls or unrelated UI visible"
+    }
+  },
+  "sony_liv_subscription": {
+    "screen_name": "Sony LIV Subscription Screen",
+    "description": "Subscription and pricing comparison screen prompting the user to subscribe to Sony LIV premium plans.",
+    "layout": {
+      "header": {
+        "position": "top",
+        "focusable": false,
+        "visible_text": [
+          "Subscribe to watch all content on Sony LIV"
+        ]
+      },
+      "plans_table": {
+        "position": "center",
+        "focusable": true,
+        "columns": [
+          "LIV Premium Yearly",
+          "LIV Premium Monthly"
+        ],
+        "navigation": {
+          "horizontal": "KEY_LEFT / KEY_RIGHT",
+          "vertical": "KEY_UP / KEY_DOWN"
+        }
+      },
+      "cta_section": {
+        "position": "bottom_center",
+        "focusable": true,
+        "primary_action": "Pay",
+        "secondary_action": "Select a promo code"
+      }
+    },
+    "visible_content": {
+      "plans": [
+        {
+          "name": "LIV Premium Yearly",
+          "price": "₹1499 Yearly"
+        },
+        {
+          "name": "LIV Premium Monthly",
+          "price": "₹399 Monthly"
+        }
+      ],
+      "features": [
+        "Movies, Originals and Live Sports",
+        "Number of logged in devices",
+        "Watch on devices at same time",
+        "Max Video Quality",
+        "Max Audio Quality",
+        "Ad free experience"
+      ],
+      "quality_labels": [
+        "Upto 4K UHD",
+        "Dolby Atmos"
+      ],
+      "footer_links": [
+        "Terms and conditions",
+        "Privacy Policy"
+      ]
+    },
+    "focus_rules": {
+      "initial_focus": "LIV Premium Yearly plan",
+      "single_focus_only": true,
+      "focused_item_visuals": [
+        "Yellow highlighted plan card",
+        "Bold price text"
+      ]
+    },
+    "navigation_rules": {
+      "KEY_LEFT": "Moves focus between subscription plans",
+      "KEY_RIGHT": "Moves focus between subscription plans",
+      "KEY_DOWN": "Moves focus toward Pay button",
+      "KEY_ENTER": "Selects plan or proceeds to payment"
+    },
+    "assertion_hints": {
+      "strong_indicators": [
+        "Subscribe to watch all content on Sony LIV",
+        "LIV Premium",
+        "₹1499",
+        "₹399",
+        "Pay"
+      ],
+      "weak_indicators": [
+        "Terms and conditions",
+        "Privacy Policy"
+      ]
+    }
+  },
+  "sony_liv_movies": {
+    "title": "Sony LIV Movies Screen",
+    "description": "Sony LIV movies browsing screen showing promotional banner and horizontal movie carousels",
+    "screen_type": "content_browse",
+    "visible_contents": {
+      "mandatory": [
+        "sony_liv_logo",
+        "large_promotional_banner",
+        "movie_or_content_tiles",
+        "focused_tile_highlight"
+      ],
+      "optional": [
+        "category_label_text",
+        "language_or_genre_text",
+        "carousel_navigation_arrow",
+        "imdb_or_rating_section"
+      ]
+    },
+    "ui_characteristics": [
+      "large hero banner occupying upper portion of screen",
+      "horizontal carousel of movie tiles below banner",
+      "one tile is visually highlighted with border or glow",
+      "background is static promotional artwork"
+    ],
+    "focus_rules": {
+      "initial_focus": "first_movie_tile_in_carousel",
+      "navigation_behavior": [
+        "LEFT and RIGHT navigate between movie tiles",
+        "UP moves focus away from tiles toward banner or tabs",
+        "DOWN moves focus to next content row"
+      ]
+    },
+    "assertion_rules": [
+      "Do not require exact banner text match",
+      "Banner title and promotional text may change",
+      "Ignore specific movie names or artwork",
+      "Validate based on layout, banner presence, and tile structure",
+      "Ignore reflections and camera artifacts"
+    ],
+    "confidence_guidelines": {
+      "high": "Banner, movie tiles, and focused highlight are clearly visible",
+      "medium": "Tiles visible but banner partially obscured",
+      "low": "Only video or unrelated UI elements visible"
+    }
+  },
+  "sony_liv_video_player": {
+    "title": "Video Player Screen",
+    "description": "Full-screen media playback screen with overlay controls",
+    "screen_type": "player",
+    "visible_contents": {
+      "mandatory": [
+        "play_or_pause_button",
+        "progress_bar_or_timeline",
+        "back_icon",
+        "media_title_text"
+      ],
+      "optional": [
+        "audio_settings",
+        "subtitle_settings",
+        "duration_time",
+        "current_play_time",
+        "age_rating_badge"
+      ]
+    },
+    "ui_characteristics": [
+      "controls overlay appears on interaction",
+      "video content occupies most of the screen",
+      "background is moving video frames",
+      "controls may auto-hide after inactivity"
+    ],
+    "focus_rules": {
+      "initial_focus": "play_pause_button_or_timeline",
+      "navigation_behavior": [
+        "LEFT or RIGHT moves along timeline",
+        "UP opens control options",
+        "BACK exits player"
+      ]
+    },
+    "assertion_rules": [
+      "Do not require exact title match",
+      "Title text may vary depending on content",
+      "Ignore characters, faces, or scene visuals",
+      "Ignore reflections and camera artifacts",
+      "Validate based on UI controls and structure"
+    ],
+    "confidence_guidelines": {
+      "high": "Play/Pause, timeline, and back icon are all clearly visible",
+      "medium": "Most controls visible but partially occluded",
+      "low": "Only video content visible without clear controls"
     }
   }
 }
